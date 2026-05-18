@@ -1,0 +1,17 @@
+.git/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+dist/
+build/
+coverage/
+*.pyc
+*.log
+.forgeloop.local.json
+.claude/settings.local.json
+.aider.chat.history.md
+.aider.input.history
+.aider.tags.cache.v*
+docs/palace/indexes/*.json

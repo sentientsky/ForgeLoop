@@ -1,0 +1,6 @@
+read:
+  - AGENTS.md
+
+auto-commits: false
+dirty-commits: false
+analytics-disable: true

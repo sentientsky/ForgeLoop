@@ -1,0 +1,50 @@
+---
+description: ForgeLoop operating rules for Cursor Agent.
+globs:
+alwaysApply: true
+---
+
+# ForgeLoop Cursor Rules
+
+Use these rules when working in this repository with Cursor Agent.
+
+## Workflow
+
+- Follow Discover, Frame, Build, Check, Capture for non-trivial work.
+- Inspect before editing.
+- Keep changes small and reversible.
+- Update docs when behaviour changes.
+- Capture reusable lessons after meaningful work.
+
+## Token Economy
+
+Before reading broad memory folders, run:
+
+```bash
+python -m forgeloop pack "<task query>" . --limit 5
+```
+
+Use the FCP/1 output as a pointer list.
+
+Open only exact source files that matter for the current task.
+
+Do not paste whole memory folders into chat.
+
+## Validation
+
+Run relevant checks before calling work complete:
+
+```bash
+python -m unittest discover -s tests
+python -m forgeloop validate .
+python -m forgeloop compat .
+python -m forgeloop index . --check
+python -m forgeloop secrets check .
+```
+
+## Safety
+
+- Keep secrets outside the repository.
+- Do not add active hooks without review and tests.
+- Do not edit generated memory indexes manually.
+- Do not make percentage token-savings claims without measured output.

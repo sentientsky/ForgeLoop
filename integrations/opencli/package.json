@@ -1,0 +1,11 @@
+{
+  "name": "opencli-plugin-forgeloop",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "OpenCLI plugin surface for ForgeLoop local health and context packet commands.",
+  "peerDependencies": {
+    "@jackwener/opencli": ">=1.7.16"
+  }
+}
+

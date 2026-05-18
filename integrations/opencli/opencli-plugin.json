@@ -1,0 +1,7 @@
+{
+  "name": "forgeloop",
+  "version": "0.1.0",
+  "opencli": ">=1.7.16",
+  "description": "ForgeLoop local project health and context packet commands for OpenCLI."
+}
+

@@ -1,0 +1,47 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local ForgeLoop setup
+.forgeloop.local.json
+
+# Local environment files
+.env
+.env.*
+!.env.example
+.envrc
+*.env
+secrets.env
+secret.env
+
+# Claude local-only files
+.claude/settings.local.json
+.claude/agent-memory-local/
+
+# Aider local-only files
+.aider.chat.history.md
+.aider.input.history
+.aider.tags.cache.v*
+
+# Build output
+dist/
+build/
+coverage/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.venv/
+venv/
+
+# Logs
+*.log
+logs/

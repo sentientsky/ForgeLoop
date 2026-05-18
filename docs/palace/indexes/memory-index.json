@@ -1,0 +1,373 @@
+{
+  "schema_version": 1,
+  "generated_by": "forgeloop 0.1.0",
+  "record_count": 24,
+  "records": [
+    {
+      "path": "docs/captures/2026-04-17-external-secrets-outside-repository.md",
+      "title": "Capture: External Secrets Outside Repository",
+      "type": "capture",
+      "status": "current",
+      "tags": [],
+      "valid_from": "2026-04-17",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-04-17-mempalace-review-production-expansion.md",
+      "title": "Capture: MemPalace Review And Production Expansion",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "memory",
+        "validation",
+        "portability",
+        "originality"
+      ],
+      "valid_from": "2026-04-17",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-04-17-secure-cli-and-hook-simulation-hardening.md",
+      "title": "Capture: Secure CLI And Hook Simulation Hardening",
+      "type": "capture",
+      "status": "current",
+      "tags": [],
+      "valid_from": "2026-04-17",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-04-26-cross-tool-compatibility.md",
+      "title": "Capture: Cross-Tool Compatibility",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "compatibility",
+        "claude-code",
+        "codex",
+        "cursor"
+      ],
+      "valid_from": "2026-04-26",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-04-26-forgeloop-v3-token-economy.md",
+      "title": "Capture: ForgeLoop V3 Token Economy",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "memory",
+        "token-economy",
+        "forgepack",
+        "v3"
+      ],
+      "valid_from": "2026-04-26",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-04-26-menu-driven-tool-setup.md",
+      "title": "Capture: Menu-Driven Tool Setup",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "setup",
+        "compatibility",
+        "cli",
+        "ai-coding-tools"
+      ],
+      "valid_from": "2026-04-26",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-05-02-matt-every-review-v4-direction.md",
+      "title": "Capture: Matt And Every Review For ForgeLoop V4",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "research",
+        "skills",
+        "review",
+        "memory",
+        "v4"
+      ],
+      "valid_from": "2026-05-02",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-05-02-native-tool-profiles-token-hardening.md",
+      "title": "Native Tool Profiles And Token Hardening",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "compatibility",
+        "tokens",
+        "setup",
+        "security"
+      ],
+      "valid_from": "2026-05-02",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-05-04-superpowers-audit-v4-1-direction.md",
+      "title": "Capture: Superpowers Audit And ForgeLoop V4.1 Direction",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "audit",
+        "superpowers",
+        "deployment",
+        "skills",
+        "v4.1"
+      ],
+      "valid_from": "2026-05-04",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-05-11-opencli-integration.md",
+      "title": "OpenCLI Integration Capture",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "opencli",
+        "integration",
+        "security",
+        "plugin"
+      ],
+      "valid_from": "2026-05-11",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-05-18-opencli-registry-drift.md",
+      "title": "OpenCLI Registry Drift",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "opencli",
+        "registry",
+        "drift",
+        "integration"
+      ],
+      "valid_from": "2026-05-18",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-05-18-public-release-polish.md",
+      "title": "Public Release Polish",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "release",
+        "polish",
+        "skills",
+        "docs"
+      ],
+      "valid_from": "2026-05-18",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/audited-skill-eval-and-deployment-gates.md",
+      "title": "Audited Skill Eval And Deployment Gates",
+      "type": "solution",
+      "status": "current",
+      "tags": [
+        "skills",
+        "evals",
+        "deployment",
+        "security",
+        "quality"
+      ],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/context-packets-over-context-dumps.md",
+      "title": "Context Packets Over Context Dumps",
+      "type": "solution",
+      "status": "current",
+      "tags": [
+        "memory",
+        "context",
+        "token-economy",
+        "forgepack"
+      ],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/dependency-light-memory-validation.md",
+      "title": "Dependency-Light Memory Validation",
+      "type": "solution",
+      "status": "current",
+      "tags": [
+        "memory",
+        "validation",
+        "cli",
+        "portability"
+      ],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/dry-run-hooks-before-activation.md",
+      "title": "Solution: Dry Run Hooks Before Activation",
+      "type": "solution",
+      "status": "current",
+      "tags": [],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/external-env-file-outside-repo.md",
+      "title": "Solution: External Env File Outside Repo",
+      "type": "solution",
+      "status": "current",
+      "tags": [],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/menu-driven-agent-tool-selection.md",
+      "title": "Menu-Driven Agent Tool Selection",
+      "type": "solution",
+      "status": "current",
+      "tags": [
+        "setup",
+        "compatibility",
+        "onboarding",
+        "cli"
+      ],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/native-ai-tool-profile-pattern.md",
+      "title": "Native AI Tool Profile Pattern",
+      "type": "solution",
+      "status": "current",
+      "tags": [
+        "compatibility",
+        "setup",
+        "tooling"
+      ],
+      "valid_from": "2026-05-02",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/opencli-integrated-peer-plugin.md",
+      "title": "OpenCLI Integrated Peer Plugin",
+      "type": "solution",
+      "status": "current",
+      "tags": [
+        "opencli",
+        "plugin",
+        "integration",
+        "security"
+      ],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/portable-agent-instructions.md",
+      "title": "Portable Agent Instructions",
+      "type": "solution",
+      "status": "current",
+      "tags": [
+        "compatibility",
+        "agents",
+        "codex",
+        "cursor",
+        "claude-code"
+      ],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/solutions/skill-ladder-and-language-led-ai-engineering.md",
+      "title": "Skill Ladder And Language-Led AI Engineering",
+      "type": "solution",
+      "status": "current",
+      "tags": [
+        "skills",
+        "language",
+        "memory",
+        "tokens",
+        "workflow"
+      ],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/decisions/0001-keep-forgeloop-local-first.md",
+      "title": "0001 Keep ForgeLoop Local First",
+      "type": "decision",
+      "status": "accepted",
+      "tags": [
+        "memory",
+        "security",
+        "release"
+      ],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/decisions/0002-integrate-opencli-as-peer-plugin.md",
+      "title": "0002 Integrate OpenCLI As A Peer Plugin",
+      "type": "decision",
+      "status": "accepted",
+      "tags": [
+        "opencli",
+        "integration",
+        "security"
+      ],
+      "valid_from": "",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    }
+  ]
+}

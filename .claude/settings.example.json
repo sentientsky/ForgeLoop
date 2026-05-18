@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "InstructionsLoaded": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo ForgeLoop loaded. Use Discover, Frame, Build, Check, Capture."
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "auto|manual",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo Before compaction, save current task state into docs/captures/ if it is non-trivial."
+          }
+        ]
+      }
+    ]
+  }
+}
+
