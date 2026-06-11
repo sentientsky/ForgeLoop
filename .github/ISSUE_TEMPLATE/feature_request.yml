@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest a focused ForgeLoop improvement.
+title: "Feature: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: workflow
+    attributes:
+      label: User Workflow
+      description: What user task becomes better?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should ForgeLoop add or change?
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks Or Trade-offs
+      description: What could get worse?
+    validations:
+      required: false
+

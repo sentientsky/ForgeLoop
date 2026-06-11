@@ -2,6 +2,12 @@
 
 This guide is for a new user opening ForgeLoop for the first time.
 
+For installation details, see `docs/INSTALLATION.md`.
+
+For every command, see `docs/COMMAND_REFERENCE.md`.
+
+For common problems, see `docs/TROUBLESHOOTING.md`.
+
 ## 1. Check The Project
 
 From the repository root:
@@ -95,4 +101,3 @@ Install only when you explicitly want it:
 ```bash
 python -m forgeloop opencli install . --execute
 ```
-

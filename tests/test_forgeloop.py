@@ -340,6 +340,7 @@ class DoctorTests(unittest.TestCase):
 
         self.assertEqual([], errors)
         self.assertTrue(any(check["name"] == "opencli" for check in report["checks"]))
+        self.assertTrue(any(check["name"] == "release-assets" for check in report["checks"]))
 
     def test_doctor_cli_outputs_health_report(self) -> None:
         root = Path(__file__).resolve().parents[1]

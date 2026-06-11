@@ -19,3 +19,20 @@ Each stage has its own folder so tasks leave a clear trail:
 - `palace/`: domain-shaped long-term memory
 
 If a note might help a future task, store it here instead of leaving it only in chat.
+
+Public user guides:
+
+- `WHAT_IT_IS.md`
+- `GETTING_STARTED.md`
+- `INSTALLATION.md`
+- `HOW_TO_USE.md`
+- `COMMAND_REFERENCE.md`
+- `TROUBLESHOOTING.md`
+- `FAQ.md`
+
+Maintainer guides:
+
+- `RELEASE_GUIDE.md`
+- `PUBLISHING.md`
+- `MAINTAINER_GUIDE.md`
+- `GITHUB_PAGE.md`

@@ -84,8 +84,10 @@ def doctor_report(root: Path) -> dict[str, Any]:
     _add(
         checks,
         "local-setup",
-        "ok" if local_setup.is_file() else "warn",
-        "Local setup profile exists." if local_setup.is_file() else "No local setup profile selected yet.",
+        "ok",
+        "Local setup profile exists."
+        if local_setup.is_file()
+        else "No local setup profile selected yet. This is normal for a clean clone.",
         {"path": LOCAL_SETUP_FILE},
     )
 
@@ -100,24 +102,52 @@ def doctor_report(root: Path) -> dict[str, Any]:
         {"path": ".github/workflows/ci.yml"},
     )
 
+    release_files = {
+        "CHANGELOG.md": "changelog",
+        "CODE_OF_CONDUCT.md": "code of conduct",
+        "SUPPORT.md": "support policy",
+        "docs/INSTALLATION.md": "installation guide",
+        "docs/COMMAND_REFERENCE.md": "command reference",
+        "docs/TROUBLESHOOTING.md": "troubleshooting guide",
+        "docs/PUBLISHING.md": "publishing guide",
+        "docs/MAINTAINER_GUIDE.md": "maintainer guide",
+        ".github/PULL_REQUEST_TEMPLATE.md": "pull request template",
+        ".github/ISSUE_TEMPLATE/bug_report.yml": "bug issue form",
+        ".github/ISSUE_TEMPLATE/feature_request.yml": "feature issue form",
+        ".github/ISSUE_TEMPLATE/documentation.yml": "documentation issue form",
+        ".github/dependabot.yml": "Dependabot config",
+        ".github/workflows/release.yml": "release workflow",
+        ".github/workflows/scorecard.yml": "Scorecard workflow",
+    }
+    missing_release = [path for path in release_files if not (root / path).is_file()]
+    _add(
+        checks,
+        "release-assets",
+        "error" if missing_release else "ok",
+        "Production release assets are present." if not missing_release else "Some production release assets are missing.",
+        {"missing": missing_release},
+    )
+
     tokenizer_ready = importlib.util.find_spec("tiktoken") is not None
     _add(
         checks,
         "tokenizer",
-        "ok" if tokenizer_ready else "warn",
-        "Optional tiktoken tokenizer is installed." if tokenizer_ready else "Optional tiktoken tokenizer is not installed; token counts may be estimated.",
+        "ok",
+        "Optional tiktoken tokenizer is installed."
+        if tokenizer_ready
+        else "Optional tiktoken tokenizer is not installed; estimated token counts remain available.",
     )
 
     opencli = opencli_status(root)
-    opencli_level = "ok" if opencli["opencli"]["installed"] and opencli["node"]["ready"] else "warn"
+    opencli_level = "ok"
     if not opencli["plugin_source"]["exists"] or not opencli["plugin_source"]["manifest_exists"]:
         opencli_level = "error"
     if opencli_level == "error":
         opencli_message = "OpenCLI integration source is incomplete."
-    elif opencli_level == "ok":
+    elif opencli["opencli"]["installed"] and opencli["node"]["ready"]:
         opencli_message = "OpenCLI is installed and the ForgeLoop plugin source is present."
     else:
-        opencli_message = "ForgeLoop OpenCLI plugin source is present, but the optional OpenCLI tool is not fully installed."
+        opencli_message = "ForgeLoop OpenCLI plugin source is present. OpenCLI itself is optional and not required for core health."
     _add(
         checks,
         "opencli",

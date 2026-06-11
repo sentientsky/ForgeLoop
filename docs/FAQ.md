@@ -39,3 +39,8 @@ python -m forgeloop index . --check
 python -m forgeloop secrets check .
 ```
 
+## How do maintainers publish a package?
+
+Read `docs/PUBLISHING.md`.
+
+ForgeLoop should use PyPI Trusted Publishing, not long-lived package tokens.

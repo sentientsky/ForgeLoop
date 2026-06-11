@@ -21,6 +21,8 @@ Optional:
 ```bash
 python -m forgeloop opencli status . --fetch-npm
 python -m forgeloop opencli plan . --fetch-npm --with-skills --run-doctor
+python -m build
+python -m twine check dist/*
 ```
 
 ## Manual Checks
@@ -32,6 +34,7 @@ python -m forgeloop opencli plan . --fetch-npm --with-skills --run-doctor
 - Docs link to current commands.
 - New skills have evaluation examples or templates.
 - Memory index is current.
+- Issue templates, PR template, support docs, changelog, and publishing docs are present.
 
 ## Git Steps
 
@@ -43,6 +46,8 @@ git commit -m "Prepare ForgeLoop public release foundation"
 ```
 
 Do not push until the remote repository, description, topics, and security settings are ready.
+
+For PyPI publishing, see `docs/PUBLISHING.md`.
 
 ## GitHub Repository Settings
 
@@ -90,4 +95,3 @@ Known limitations:
 - OpenCLI must be installed explicitly
 - live clean-session verification should be refreshed as tools evolve
 ```
-

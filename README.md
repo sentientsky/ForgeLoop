@@ -133,6 +133,16 @@ ForgeLoop/
 
 New here? Start with `docs/WHAT_IT_IS.md`, then `docs/GETTING_STARTED.md`, then `docs/HOW_TO_USE.md`.
 
+Production and support docs:
+
+- `docs/INSTALLATION.md`
+- `docs/COMMAND_REFERENCE.md`
+- `docs/TROUBLESHOOTING.md`
+- `docs/RELEASE_GUIDE.md`
+- `docs/PUBLISHING.md`
+- `docs/MAINTAINER_GUIDE.md`
+- `docs/FAQ.md`
+
 1. Open this folder in Claude Code.
 2. Run the setup menu:
 
@@ -363,7 +373,12 @@ Read:
 - `docs/HOW_TO_USE.md`
 - `docs/WHAT_IT_IS.md`
 - `docs/GETTING_STARTED.md`
+- `docs/INSTALLATION.md`
+- `docs/COMMAND_REFERENCE.md`
+- `docs/TROUBLESHOOTING.md`
 - `docs/RELEASE_GUIDE.md`
+- `docs/PUBLISHING.md`
+- `docs/MAINTAINER_GUIDE.md`
 - `docs/GITHUB_PAGE.md`
 - `docs/standards/forgepack-language-reference.md`
 - `docs/integrations/opencli.md`

@@ -11,8 +11,11 @@ authors = [
 keywords = [
     "ai",
     "claude-code",
+    "codex",
     "agentic-engineering",
     "memory",
+    "developer-tools",
+    "quality",
     "workflow",
     "open-source"
 ]
@@ -25,7 +28,9 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Documentation",
     "Topic :: Utilities"
 ]
 dependencies = []
@@ -34,7 +39,10 @@ dependencies = []
 forgeloop = "forgeloop.cli:main"
 
 [project.optional-dependencies]
-dev = []
+dev = [
+    "build>=1.2.0",
+    "twine>=5.1.0",
+]
 tokenizers = [
     "tiktoken>=0.12.0",
 ]

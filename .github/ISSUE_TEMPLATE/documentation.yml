@@ -1,0 +1,27 @@
+name: Documentation issue
+description: Report confusing, stale, or missing documentation.
+title: "Docs: "
+labels: ["documentation"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page Or File
+      description: Which document needs attention?
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: Issue
+      description: What is confusing, stale, or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested Fix
+      description: Optional wording or structure.
+    validations:
+      required: false
+
