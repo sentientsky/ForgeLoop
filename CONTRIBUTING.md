@@ -42,17 +42,37 @@ Before opening a pull request, check:
 - tool support changes include an acceptance prompt or transcript
 - public claims include measured command output
 
+## Review And Approval
+
+Opening a pull request does not grant permission to merge it. Automated checks never auto-approve a contribution.
+
+The normal path is:
+
+1. A contributor opens a focused pull request.
+2. CI, package smoke tests, and security scanning run.
+3. A maintainer reviews the code, docs, risks, and evidence.
+4. The contributor resolves requested changes and conversations.
+5. A maintainer merges only after the required checks and approvals pass.
+
+Dependabot and AI-authored changes use the same process. See `GOVERNANCE.md` for maintainer roles, high-risk changes, waiting periods, and release authority.
+
 ## Required Commands
 
-Run:
+Install the development tools, then run:
 
 ```bash
-python -m unittest discover -s tests
+python -m pip install -e ".[dev]"
+python -m ruff check forgeloop tests
+python -m coverage run -m unittest discover -s tests
+python -m coverage report
 python -m forgeloop validate .
 python -m forgeloop doctor .
 python -m forgeloop compat .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
+python -m build
+python -m twine check dist/*
+python tests/package_smoke.py dist .
 ```
 
 ## Style

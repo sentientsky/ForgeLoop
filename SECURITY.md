@@ -4,13 +4,19 @@ ForgeLoop is an early open source project. Please report security issues respons
 
 ## Supported Versions
 
-The current development version is supported until the first public release process is defined.
+| Version | Supported |
+| --- | --- |
+| Latest `0.1.x` release | Yes |
+| Unreleased `main` branch | Best effort |
+| Older versions | No |
 
 ## Reporting A Vulnerability
 
-If you find a security issue, open a private security advisory on GitHub once the repository is public.
+If you find a security issue, use private vulnerability reporting or open a private security advisory on GitHub once the repository is public. Include affected versions, reproduction steps, impact, and any suggested mitigation.
 
 Until then, do not publish exploit details in public issues.
+
+Maintainers should acknowledge a private report within three working days, provide an initial assessment within seven working days, and coordinate disclosure after a fix is available. Complex reports may take longer, but reporters should receive progress updates.
 
 ## Security Priorities
 

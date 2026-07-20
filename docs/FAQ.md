@@ -24,6 +24,18 @@ Yes. Start with `docs/GETTING_STARTED.md` and the five-stage loop.
 
 Yes. Use the setup menu, compatibility report, doctor command, contribution guide, and CI workflow.
 
+## How are contributions approved?
+
+Contributors open a pull request. Automation tests the change, then a maintainer reviews it. Passing checks do not auto-approve or auto-merge a contribution. The complete rules are in `../GOVERNANCE.md`.
+
+## Are Dependabot or AI-authored changes trusted automatically?
+
+No. They use the same tests, security checks, human review, and approval rules as any other contribution.
+
+## Where are the GitHub launch instructions?
+
+Use `GITHUB_SETUP.md` for repository creation, branch protection, security settings, PyPI Trusted Publishing, and the first public release.
+
 ## Are hooks active by default?
 
 No. Hooks are documented and simulated first. Active automation should be opt-in after review.

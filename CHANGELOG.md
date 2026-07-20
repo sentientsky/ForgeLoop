@@ -8,6 +8,18 @@ ForgeLoop follows practical semantic versioning:
 - minor versions for new compatible commands, skills, templates, or integrations
 - major versions for breaking workflow, CLI, or package changes
 
+## Unreleased
+
+- added Python 3.13 and 3.14 CI coverage
+- added Ruff linting and a measured branch-coverage floor
+- added an isolated installed-wheel smoke test to CI and releases
+- pinned every external GitHub Action to a full commit SHA
+- added CodeQL scanning, release tag verification, and build provenance
+- added pip dependency updates to Dependabot
+- added public governance and one-time GitHub setup guidance
+- added workflow validation for unsafe triggers, broad permissions, and moving action tags
+- fixed the ignore rules so the Claude Build skill is included in fresh clones
+
 ## 0.1.0 - Public Release Foundation
 
 Initial public-release foundation.

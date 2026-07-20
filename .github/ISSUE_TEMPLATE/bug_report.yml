@@ -3,6 +3,9 @@ description: Report a reproducible ForgeLoop problem.
 title: "Bug: "
 labels: ["bug"]
 body:
+  - type: markdown
+    attributes:
+      value: Do not report security vulnerabilities here. Follow SECURITY.md and use private vulnerability reporting.
   - type: textarea
     id: problem
     attributes:
@@ -31,4 +34,3 @@ body:
       description: OS, Python version, AI coding tool, and ForgeLoop version.
     validations:
       required: true
-

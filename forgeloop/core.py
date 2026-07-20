@@ -21,10 +21,12 @@ REQUIRED_FILES = [
     "GEMINI.md",
     "CHANGELOG.md",
     "CODE_OF_CONDUCT.md",
+    "GOVERNANCE.md",
     ".github/copilot-instructions.md",
     ".github/PULL_REQUEST_TEMPLATE.md",
     ".github/dependabot.yml",
     ".github/workflows/ci.yml",
+    ".github/workflows/codeql.yml",
     ".github/workflows/release.yml",
     ".github/workflows/scorecard.yml",
     ".clineignore",
@@ -45,8 +47,10 @@ REQUIRED_FILES = [
     "docs/TROUBLESHOOTING.md",
     "docs/PUBLISHING.md",
     "docs/MAINTAINER_GUIDE.md",
+    "docs/GITHUB_SETUP.md",
     "docs/integrations/opencli.md",
     "integrations/opencli/opencli-plugin.json",
+    "tests/package_smoke.py",
 ]
 REQUIRED_DIRS = [
     ".claude/skills/discover",
@@ -130,6 +134,7 @@ ALLOWED_NOTE_KINDS = {
 }
 ALLOWED_HOOK_EVENTS = {"Stop", "PreCompact", "SessionEnd"}
 SAFE_IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9_.-]{1,120}$")
+PINNED_ACTION_RE = re.compile(r"^[0-9a-f]{40}$", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -227,6 +232,7 @@ def validate_repo(root: Path) -> list[Finding]:
     findings.extend(_validate_json_files(root))
     findings.extend(_validate_directory_safety(root))
     findings.extend(_validate_file_safety(root))
+    findings.extend(_validate_github_workflows(root))
     findings.extend(_validate_cursor_rules(root))
     findings.extend(_validate_native_tool_profiles(root))
     findings.extend(_validate_opencli_integration(root))
@@ -438,6 +444,63 @@ def repo_status(root: Path) -> dict[str, Any]:
         "memory_records": len(collect_memory_records(root)),
         "index_exists": (root / "docs/palace/indexes/memory-index.json").is_file(),
     }
+
+
+def _validate_github_workflows(root: Path) -> list[Finding]:
+    findings: list[Finding] = []
+    workflow_dir = root / ".github/workflows"
+    if not workflow_dir.is_dir():
+        return findings
+
+    workflow_paths = sorted([*workflow_dir.glob("*.yml"), *workflow_dir.glob("*.yaml")])
+    for path in workflow_paths:
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if re.search(r"^\s*pull_request_target\s*:", text, re.MULTILINE):
+            findings.append(
+                Finding(
+                    "error",
+                    "risky-workflow-trigger",
+                    "pull_request_target is forbidden because it can expose privileged workflow context",
+                    path,
+                )
+            )
+        if not re.search(r"^\s*permissions\s*:", text, re.MULTILINE):
+            findings.append(
+                Finding(
+                    "error",
+                    "workflow-permissions",
+                    "Workflow must declare explicit least-privilege permissions",
+                    path,
+                )
+            )
+        if re.search(r"^\s*permissions\s*:\s*write-all\s*$", text, re.MULTILINE):
+            findings.append(
+                Finding(
+                    "error",
+                    "workflow-write-all",
+                    "Workflow must not grant write-all permissions",
+                    path,
+                )
+            )
+
+        for line_number, line in enumerate(text.splitlines(), start=1):
+            match = re.search(r"\buses:\s*([^\s#]+)", line)
+            if not match:
+                continue
+            action = match.group(1).strip("\"'")
+            if action.startswith(("./", "docker://")):
+                continue
+            _name, separator, reference = action.rpartition("@")
+            if not separator or not PINNED_ACTION_RE.fullmatch(reference):
+                findings.append(
+                    Finding(
+                        "error",
+                        "unpinned-action",
+                        f"External action on line {line_number} must be pinned to a full commit SHA: {action}",
+                        path,
+                    )
+                )
+    return findings
 
 
 def _validate_versions(root: Path) -> list[Finding]:

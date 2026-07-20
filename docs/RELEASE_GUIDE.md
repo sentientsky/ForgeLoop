@@ -7,13 +7,19 @@ Use this guide before publishing ForgeLoop to GitHub.
 Run:
 
 ```bash
-python -m unittest discover -s tests
+python -m pip install -e ".[dev]"
+python -m ruff check forgeloop tests
+python -m coverage run -m unittest discover -s tests
+python -m coverage report
 python -m forgeloop validate .
 python -m forgeloop doctor .
 python -m forgeloop compat .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
 python -m forgeloop tokens "release readiness" . --limit 5
+python -m build
+python -m twine check dist/*
+python tests/package_smoke.py dist .
 ```
 
 Optional:
@@ -21,8 +27,6 @@ Optional:
 ```bash
 python -m forgeloop opencli status . --fetch-npm
 python -m forgeloop opencli plan . --fetch-npm --with-skills --run-doctor
-python -m build
-python -m twine check dist/*
 ```
 
 ## Manual Checks
@@ -35,6 +39,9 @@ python -m twine check dist/*
 - New skills have evaluation examples or templates.
 - Memory index is current.
 - Issue templates, PR template, support docs, changelog, and publishing docs are present.
+- GitHub Actions use full commit SHA pins.
+- The release tag matches the package version.
+- Governance approval requirements are satisfied.
 
 ## Git Steps
 
@@ -42,10 +49,10 @@ python -m twine check dist/*
 git status --short
 git add .
 git status --short
-git commit -m "Prepare ForgeLoop public release foundation"
+git commit -m "Prepare ForgeLoop release"
 ```
 
-Do not push until the remote repository, description, topics, and security settings are ready.
+Do not push until the remote repository, description, topics, and security settings are ready. Follow `docs/GITHUB_SETUP.md` for the one-time public launch.
 
 For PyPI publishing, see `docs/PUBLISHING.md`.
 

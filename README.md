@@ -93,6 +93,7 @@ ForgeLoop/
 +-- GEMINI.md
 +-- LICENSE
 +-- CONTRIBUTING.md
++-- GOVERNANCE.md
 +-- .gitignore
 +-- .claude/
 |   +-- skills/
@@ -141,7 +142,10 @@ Production and support docs:
 - `docs/RELEASE_GUIDE.md`
 - `docs/PUBLISHING.md`
 - `docs/MAINTAINER_GUIDE.md`
+- `docs/GITHUB_SETUP.md`
 - `docs/FAQ.md`
+
+Project stewardship is defined in `GOVERNANCE.md`. Pull requests require human review; passing automation never approves a change by itself.
 
 1. Open this folder in Claude Code.
 2. Run the setup menu:

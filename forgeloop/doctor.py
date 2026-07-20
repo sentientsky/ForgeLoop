@@ -93,24 +93,35 @@ def doctor_report(root: Path) -> dict[str, Any]:
 
     ci_path = root / ".github/workflows/ci.yml"
     ci_text = ci_path.read_text(encoding="utf-8", errors="replace") if ci_path.is_file() else ""
-    ci_ok = ci_path.is_file() and "python -m unittest discover -s tests" in ci_text and "python -m forgeloop validate ." in ci_text
+    ci_markers = [
+        "python -m coverage run -m unittest discover -s tests",
+        "python -m coverage report",
+        "python -m ruff check forgeloop tests",
+        "python -m forgeloop validate .",
+        "python tests/package_smoke.py dist .",
+    ]
+    ci_ok = ci_path.is_file() and all(marker in ci_text for marker in ci_markers)
     _add(
         checks,
         "ci",
         "ok" if ci_ok else "warn",
-        "CI workflow runs unit tests and validation." if ci_ok else "CI workflow is missing or incomplete.",
+        "CI runs tests, coverage, lint, validation, and an isolated wheel smoke test."
+        if ci_ok
+        else "CI workflow is missing or incomplete.",
         {"path": ".github/workflows/ci.yml"},
     )
 
     release_files = {
         "CHANGELOG.md": "changelog",
         "CODE_OF_CONDUCT.md": "code of conduct",
+        "GOVERNANCE.md": "project governance",
         "SUPPORT.md": "support policy",
         "docs/INSTALLATION.md": "installation guide",
         "docs/COMMAND_REFERENCE.md": "command reference",
         "docs/TROUBLESHOOTING.md": "troubleshooting guide",
         "docs/PUBLISHING.md": "publishing guide",
         "docs/MAINTAINER_GUIDE.md": "maintainer guide",
+        "docs/GITHUB_SETUP.md": "GitHub setup guide",
         ".github/PULL_REQUEST_TEMPLATE.md": "pull request template",
         ".github/ISSUE_TEMPLATE/bug_report.yml": "bug issue form",
         ".github/ISSUE_TEMPLATE/feature_request.yml": "feature issue form",
@@ -118,6 +129,8 @@ def doctor_report(root: Path) -> dict[str, Any]:
         ".github/dependabot.yml": "Dependabot config",
         ".github/workflows/release.yml": "release workflow",
         ".github/workflows/scorecard.yml": "Scorecard workflow",
+        ".github/workflows/codeql.yml": "CodeQL workflow",
+        "tests/package_smoke.py": "isolated wheel smoke test",
     }
     missing_release = [path for path in release_files if not (root / path).is_file()]
     _add(

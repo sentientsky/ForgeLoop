@@ -35,4 +35,7 @@ Maintainer guides:
 - `RELEASE_GUIDE.md`
 - `PUBLISHING.md`
 - `MAINTAINER_GUIDE.md`
+- `GITHUB_SETUP.md`
 - `GITHUB_PAGE.md`
+
+Repository-wide contribution authority and approval rules live in `../GOVERNANCE.md`.

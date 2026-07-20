@@ -110,6 +110,17 @@ class ValidationTests(unittest.TestCase):
             )
             (root / ".claude/hooks/unsafe.md").write_text("eval $(cat input)\n", encoding="utf-8")
             (root / ".env").write_text("REAL_SECRET=do-not-commit-this-value\n", encoding="utf-8")
+            (root / ".github/workflows").mkdir(parents=True)
+            (root / ".github/workflows/risky.yml").write_text(
+                "on:\n  pull_request_target:\npermissions: write-all\njobs:\n"
+                "  risky:\n    steps:\n      - uses: actions/checkout@v7\n",
+                encoding="utf-8",
+            )
+            (root / ".github/workflows/missing-permissions.yml").write_text(
+                "on:\n  push:\njobs:\n  test:\n    steps:\n"
+                "      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0\n",
+                encoding="utf-8",
+            )
 
             findings = validate_repo(root)
             codes = {finding.code for finding in findings}
@@ -117,6 +128,10 @@ class ValidationTests(unittest.TestCase):
             self.assertIn("skill-name", codes)
             self.assertIn("risky-hook", codes)
             self.assertIn("env-file-in-repo", codes)
+            self.assertIn("risky-workflow-trigger", codes)
+            self.assertIn("workflow-write-all", codes)
+            self.assertIn("workflow-permissions", codes)
+            self.assertIn("unpinned-action", codes)
 
 
 class NewNoteTests(unittest.TestCase):

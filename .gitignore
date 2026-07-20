@@ -31,7 +31,7 @@ secret.env
 
 # Build output
 dist/
-build/
+/build/
 coverage/
 
 # Python

@@ -28,6 +28,8 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development :: Quality Assurance",
     "Topic :: Software Development :: Documentation",
@@ -41,6 +43,8 @@ forgeloop = "forgeloop.cli:main"
 [project.optional-dependencies]
 dev = [
     "build>=1.2.0",
+    "coverage[toml]>=7.14.0",
+    "ruff>=0.15.0",
     "twine>=5.1.0",
 ]
 tokenizers = [
@@ -56,3 +60,15 @@ packages = ["forgeloop"]
 
 [tool.forgeloop]
 max_file_bytes = 1000000
+
+[tool.coverage.run]
+branch = true
+source = ["forgeloop"]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+target-version = "py310"

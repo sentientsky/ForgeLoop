@@ -29,3 +29,6 @@ Use `SECURITY.md`.
 
 Do not publish exploit details in public issues.
 
+## Contributions
+
+Use `CONTRIBUTING.md` for the technical checklist and `GOVERNANCE.md` for review and approval rules. Automated checks provide evidence, but a maintainer makes the merge decision.

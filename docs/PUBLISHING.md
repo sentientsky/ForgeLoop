@@ -8,6 +8,7 @@ ForgeLoop should use PyPI Trusted Publishing rather than long-lived API tokens.
 python -m pip install -e ".[dev]"
 python -m build
 python -m twine check dist/*
+python tests/package_smoke.py dist .
 ```
 
 Do not commit `dist/`.
@@ -24,7 +25,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-5. Let the GitHub release workflow publish the package.
+5. Let the GitHub release workflow verify the tag, run the release gate, test the wheel in isolation, create provenance, and publish the package.
 
 ## Trusted Publishing Setup
 
@@ -42,4 +43,3 @@ ForgeLoop's workflow does not store a PyPI token.
 Set real project URLs in `pyproject.toml` after the GitHub repository URL is final.
 
 Do not publish with placeholder URLs.
-
