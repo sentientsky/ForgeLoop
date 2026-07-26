@@ -3,7 +3,7 @@ type: capture
 date: 2026-06-21
 status: current
 task: production release audit
-supersedes:
+supersedes: 2026-05-04-superpowers-audit-v4-1-direction
 superseded_by:
 valid_from: 2026-06-21
 valid_to:

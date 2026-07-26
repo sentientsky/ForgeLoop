@@ -17,6 +17,7 @@ ForgeLoop follows practical semantic versioning:
 - added CodeQL scanning, release tag verification, and build provenance
 - added pip dependency updates to Dependabot
 - added public governance and one-time GitHub setup guidance
+- added public roadmap and current-status guidance
 - added workflow validation for unsafe triggers, broad permissions, and moving action tags
 - fixed the ignore rules so the Claude Build skill is included in fresh clones
 

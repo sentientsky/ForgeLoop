@@ -14,6 +14,7 @@ Each stage has its own folder so tasks leave a clear trail:
 - `language/`: shared project terms
 - `decisions/`: durable trade-offs
 - `benchmarks/`: measured evidence for public claims
+- `research/`: timestamped product and competitor research
 - `compatibility/`: tool support, deployment matrix, and acceptance prompts
 - `integrations/`: optional peer integrations such as OpenCLI
 - `palace/`: domain-shaped long-term memory
@@ -26,6 +27,7 @@ Public user guides:
 - `GETTING_STARTED.md`
 - `INSTALLATION.md`
 - `HOW_TO_USE.md`
+- `ROADMAP.md`
 - `COMMAND_REFERENCE.md`
 - `TROUBLESHOOTING.md`
 - `FAQ.md`

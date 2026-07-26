@@ -119,6 +119,7 @@ def doctor_report(root: Path) -> dict[str, Any]:
         "docs/INSTALLATION.md": "installation guide",
         "docs/COMMAND_REFERENCE.md": "command reference",
         "docs/TROUBLESHOOTING.md": "troubleshooting guide",
+        "docs/ROADMAP.md": "roadmap and current status",
         "docs/PUBLISHING.md": "publishing guide",
         "docs/MAINTAINER_GUIDE.md": "maintainer guide",
         "docs/GITHUB_SETUP.md": "GitHub setup guide",

@@ -2,6 +2,8 @@
 
 Date: 2026-05-04
 
+Status note, 2026-07-26: this is a historical research note. It preserves the comparison that shaped ForgeLoop V4.1, but some "not yet" statements have since been addressed. For current status, read `docs/ROADMAP.md` and `docs/captures/2026-06-21-production-release-audit.md`.
+
 This is a stricter second-pass audit. The goal is to identify what ForgeLoop missed, where it is already stronger, and what ideas can be adapted from Superpowers without copying text, code, or branding.
 
 ## Sources Reviewed
@@ -235,4 +237,3 @@ The next production step should be a quality layer:
 6. Add dynamic review routing.
 
 This makes ForgeLoop harder to fake, harder to misuse, and easier to trust.
-

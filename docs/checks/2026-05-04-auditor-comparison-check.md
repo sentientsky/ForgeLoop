@@ -2,6 +2,8 @@
 
 Date: 2026-05-04
 
+Status note, 2026-07-26: this is a historical audit. Several gaps described here were later resolved by the production release hardening work. For current status, read `docs/ROADMAP.md` and `docs/captures/2026-06-21-production-release-audit.md`.
+
 ## Scope
 
 This check compares ForgeLoop against:

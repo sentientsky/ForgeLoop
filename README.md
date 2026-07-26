@@ -124,6 +124,9 @@ ForgeLoop/
 |   +-- language/
 |   +-- decisions/
 |   +-- benchmarks/
+|   +-- compatibility/
+|   +-- research/
+|   +-- integrations/
 |   +-- palace/
 +-- memory/
 +-- templates/
@@ -138,6 +141,7 @@ Production and support docs:
 
 - `docs/INSTALLATION.md`
 - `docs/COMMAND_REFERENCE.md`
+- `docs/ROADMAP.md`
 - `docs/TROUBLESHOOTING.md`
 - `docs/RELEASE_GUIDE.md`
 - `docs/PUBLISHING.md`
@@ -379,6 +383,7 @@ Read:
 - `docs/GETTING_STARTED.md`
 - `docs/INSTALLATION.md`
 - `docs/COMMAND_REFERENCE.md`
+- `docs/ROADMAP.md`
 - `docs/TROUBLESHOOTING.md`
 - `docs/RELEASE_GUIDE.md`
 - `docs/PUBLISHING.md`

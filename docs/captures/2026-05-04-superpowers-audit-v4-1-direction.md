@@ -1,13 +1,17 @@
 ---
 type: capture
 date: 2026-05-04
-status: current
+status: superseded
 task: superpowers auditor review v4.1 direction
 valid_from: 2026-05-04
+valid_to: 2026-06-21
+superseded_by: 2026-06-21-production-release-audit
 tags: [audit, superpowers, deployment, skills, v4.1]
 ---
 
 # Capture: Superpowers Audit And ForgeLoop V4.1 Direction
+
+Status note, 2026-07-26: this capture remains useful for product history, but the production-release hardening work resolved several gaps listed here. Current status lives in `docs/ROADMAP.md` and `docs/captures/2026-06-21-production-release-audit.md`.
 
 ## What Happened
 
@@ -48,4 +52,3 @@ ForgeLoop is not yet stronger in deployment maturity. Superpowers and Every have
 ## Next Action
 
 Implement the V4.1 hardening plan before adding more broad features.
-
