@@ -53,10 +53,18 @@ def doctor_report(root: Path) -> dict[str, Any]:
             "Real .env-style files were found inside the repository.",
             {"repo_env_files": [str(path.relative_to(root)) for path in secrets.repo_env_files]},
         )
-    elif secrets.exists:
+    elif secrets.exists and not secrets.warnings:
         _add(checks, "secrets", "ok", "External secrets file exists and no repo .env files were found.")
+    elif secrets.exists:
+        _add(checks, "secrets", "warn", "External secrets file exists but needs local attention.", {"warnings": secrets.warnings})
     else:
-        _add(checks, "secrets", "warn", "External secrets file has not been initialised yet.")
+        _add(
+            checks,
+            "secrets",
+            "warn",
+            "External secrets file has not been initialised yet or is unsafe.",
+            {"warnings": secrets.warnings},
+        )
 
     index = build_memory_index(root, check=True)
     _add(
@@ -154,7 +162,7 @@ def doctor_report(root: Path) -> dict[str, Any]:
 
     opencli = opencli_status(root)
     opencli_level = "ok"
-    if not opencli["plugin_source"]["exists"] or not opencli["plugin_source"]["manifest_exists"]:
+    if not opencli["plugin_source"]["ready"]:
         opencli_level = "error"
     if opencli_level == "error":
         opencli_message = "OpenCLI integration source is incomplete."

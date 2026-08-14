@@ -20,6 +20,8 @@ ForgeLoop follows practical semantic versioning:
 - added public roadmap and current-status guidance
 - added workflow validation for unsafe triggers, broad permissions, and moving action tags
 - fixed the ignore rules so the Claude Build skill is included in fresh clones
+- hardened external-secret writes against dangling symlinks and made OpenCLI install verification match its published plan
+- raised the release validation tool floor to Twine 7 for current Core Metadata compatibility
 
 ## 0.1.0 - Public Release Foundation
 

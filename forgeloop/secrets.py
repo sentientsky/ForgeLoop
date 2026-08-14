@@ -55,8 +55,13 @@ def init_external_secrets(root: Path, force: bool = False) -> Path:
         raise ValueError("External secrets path resolved inside the repository")
     if _has_symlink_ancestor(target.parent):
         raise ValueError("Refusing to write secrets inside a symlinked folder")
-    if target.exists() and target.is_symlink():
+    # Path.exists() is false for dangling symlinks on some platforms. Check the
+    # link itself before opening the target so a local link cannot redirect a
+    # secrets write outside the intended configuration location.
+    if target.is_symlink():
         raise ValueError("Refusing to write secrets through a symlink")
+    if target.exists() and not target.is_file():
+        raise ValueError("External secrets path must be a regular file")
     if target.exists() and not force:
         return target
 
@@ -75,11 +80,15 @@ def init_external_secrets(root: Path, force: bool = False) -> Path:
     text = "\n".join(lines).rstrip() + "\n"
 
     target.parent.mkdir(parents=True, exist_ok=True)
+    if _has_symlink_ancestor(target.parent):
+        raise ValueError("Refusing to write secrets inside a symlinked folder")
     flags = os.O_WRONLY | os.O_CREAT
     if not force:
         flags |= os.O_EXCL
     else:
         flags |= os.O_TRUNC
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
     fd = os.open(target, flags, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(text)
@@ -94,9 +103,11 @@ def check_secrets(root: Path) -> SecretsCheck:
     keys: list[str] = []
     warnings: list[str] = []
 
-    if external_path.exists():
-        if external_path.is_symlink():
-            warnings.append("External secrets file is a symlink.")
+    if external_path.is_symlink():
+        warnings.append("External secrets file is a symlink.")
+    elif external_path.exists():
+        if not external_path.is_file():
+            warnings.append("External secrets path is not a regular file.")
         else:
             text = external_path.read_text(encoding="utf-8", errors="replace")
             keys = parse_env_keys(text)
@@ -109,7 +120,8 @@ def check_secrets(root: Path) -> SecretsCheck:
     else:
         warnings.append("External secrets file does not exist yet.")
 
-    return SecretsCheck(external_path, external_path.exists(), repo_env_files, keys, warnings)
+    exists = external_path.is_file() and not external_path.is_symlink()
+    return SecretsCheck(external_path, exists, repo_env_files, keys, warnings)
 
 
 def parse_env_keys(text: str) -> list[str]:

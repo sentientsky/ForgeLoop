@@ -53,7 +53,7 @@ def opencli_status(root: Path, fetch_npm: bool = False) -> dict[str, Any]:
     npm_path = shutil.which("npm")
     npx_path = shutil.which("npx")
     opencli_path = shutil.which("opencli")
-    plugin_path = (root / OPENCLI_PLUGIN_REL).resolve()
+    plugin_source = _plugin_source_status(root)
 
     node_version = _version_from_command(node_path, ["--version"])
     node_major = parse_node_major(node_version)
@@ -71,8 +71,8 @@ def opencli_status(root: Path, fetch_npm: bool = False) -> dict[str, Any]:
         warnings.append("npm was not found on PATH. OpenCLI cannot be installed with npm.")
     if not opencli_path:
         warnings.append("OpenCLI is not installed on PATH yet.")
-    if not plugin_path.is_dir():
-        warnings.append(f"ForgeLoop OpenCLI plugin source is missing: {OPENCLI_PLUGIN_REL}.")
+    if not plugin_source["ready"]:
+        warnings.append(plugin_source["reason"])
     warnings.extend(registry["warnings"])
 
     return {
@@ -102,11 +102,8 @@ def opencli_status(root: Path, fetch_npm: bool = False) -> dict[str, Any]:
             "installed": bool(opencli_path),
         },
         "plugin_source": {
-            "path": str(plugin_path),
-            "relative_path": OPENCLI_PLUGIN_REL,
-            "exists": plugin_path.is_dir(),
-            "manifest_exists": (plugin_path / "opencli-plugin.json").is_file(),
-            "install_command": ["opencli", "plugin", "install", str(plugin_path)],
+            **plugin_source,
+            "install_command": ["opencli", "plugin", "install", plugin_source["path"]],
         },
         "skills": {
             "package": OPENCLI_SKILLS_PACKAGE,
@@ -124,7 +121,7 @@ def opencli_plan(
     fetch_npm: bool = False,
 ) -> dict[str, Any]:
     root = root.resolve()
-    plugin_path = (root / OPENCLI_PLUGIN_REL).resolve()
+    plugin_source = _plugin_source_status(root)
     steps: list[dict[str, Any]] = [
         {
             "name": "Install or update OpenCLI",
@@ -135,7 +132,7 @@ def opencli_plan(
         },
         {
             "name": "Install ForgeLoop OpenCLI plugin source",
-            "command": ["opencli", "plugin", "install", str(plugin_path)],
+            "command": ["opencli", "plugin", "install", plugin_source["path"]],
             "network": False,
             "writes": "local OpenCLI plugin registry",
             "safe_default": "manual or explicit --execute only",
@@ -216,8 +213,8 @@ def run_opencli_install(
         return _blocked_install(plan, "Node.js >= 21 is required before installing OpenCLI.")
     if not status["npm"]["ready"]:
         return _blocked_install(plan, "npm is required before installing OpenCLI.")
-    if not status["plugin_source"]["exists"]:
-        return _blocked_install(plan, "ForgeLoop OpenCLI plugin source is missing.")
+    if not status["plugin_source"]["ready"]:
+        return _blocked_install(plan, status["plugin_source"]["reason"])
 
     npm = status["npm"]["path"]
     results.append(_run_fixed(npm, ["install", "-g", OPENCLI_PACKAGE_LATEST], timeout=timeout))
@@ -238,9 +235,19 @@ def run_opencli_install(
         )
         return _install_result(plan, results, "blocked")
 
-    plugin_path = str((root / OPENCLI_PLUGIN_REL).resolve())
+    plugin_source = _plugin_source_status(root)
+    if not plugin_source["ready"]:
+        return _blocked_install(plan, plugin_source["reason"])
+    plugin_path = plugin_source["path"]
     results.append(_run_fixed(opencli, ["plugin", "install", plugin_path], timeout=timeout))
+    if results[-1].exit_code != 0 or results[-1].timed_out or results[-1].skipped:
+        return _install_result(plan, results, "failed")
     results.append(_run_fixed(opencli, ["--version"], timeout=DEFAULT_STATUS_TIMEOUT))
+    if results[-1].exit_code != 0 or results[-1].timed_out or results[-1].skipped:
+        return _install_result(plan, results, "failed")
+    results.append(_run_fixed(opencli, ["list", "-f", "json"], timeout=DEFAULT_STATUS_TIMEOUT))
+    if results[-1].exit_code != 0 or results[-1].timed_out or results[-1].skipped:
+        return _install_result(plan, results, "failed")
 
     if run_doctor:
         results.append(_run_fixed(opencli, ["doctor"], timeout=timeout))
@@ -414,6 +421,52 @@ def _empty_registry_metadata() -> dict[str, Any]:
         "license": "",
         "warnings": [],
     }
+
+
+def _plugin_source_status(root: Path) -> dict[str, Any]:
+    """Describe the local plugin source without following repository symlinks."""
+    path = root / OPENCLI_PLUGIN_REL
+    manifest = path / "opencli-plugin.json"
+    base = {
+        "path": str(path),
+        "relative_path": OPENCLI_PLUGIN_REL,
+        "exists": path.is_dir(),
+        "manifest_exists": manifest.is_file() and not manifest.is_symlink(),
+    }
+    if _has_symlink_ancestor(path, root):
+        return {**base, "ready": False, "reason": "ForgeLoop OpenCLI plugin source must not use symlinks."}
+    try:
+        resolved = path.resolve()
+    except (OSError, RuntimeError):
+        return {
+            **base,
+            "ready": False,
+            "reason": "ForgeLoop OpenCLI plugin source could not be resolved safely.",
+        }
+    if resolved != root and root not in resolved.parents:
+        return {**base, "ready": False, "reason": "ForgeLoop OpenCLI plugin source resolves outside the repository."}
+    if not path.is_dir():
+        return {
+            **base,
+            "ready": False,
+            "reason": f"ForgeLoop OpenCLI plugin source is missing: {OPENCLI_PLUGIN_REL}.",
+        }
+    if manifest.is_symlink() or not manifest.is_file():
+        return {
+            **base,
+            "ready": False,
+            "reason": "ForgeLoop OpenCLI plugin manifest is missing or unsafe.",
+        }
+    return {**base, "ready": True, "reason": ""}
+
+
+def _has_symlink_ancestor(path: Path, root: Path) -> bool:
+    current = path
+    while current != root:
+        if current.is_symlink():
+            return True
+        current = current.parent
+    return False
 
 
 def _version_from_command(executable: str | None, args: list[str]) -> str:

@@ -76,7 +76,7 @@ Then it installs this repository's plugin source:
 opencli plugin install integrations/opencli
 ```
 
-The actual command uses an absolute path and fixed arguments. It does not use shell interpolation.
+The actual command uses an absolute path and fixed arguments. It does not use shell interpolation. It refuses plugin folders or manifests that use symlinks, then verifies the installed binary and command registry with `opencli --version` and `opencli list -f json` before optional doctor or skill steps.
 
 ForgeLoop keeps a conservative Node.js baseline from the OpenCLI installation docs. The npm package metadata can change faster than the docs, so `--fetch-npm` records registry drift instead of silently changing the local policy.
 

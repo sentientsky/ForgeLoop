@@ -45,7 +45,7 @@ dev = [
     "build>=1.2.0",
     "coverage[toml]>=7.14.0",
     "ruff>=0.15.0",
-    "twine>=5.1.0",
+    "twine>=7.0.0",
 ]
 tokenizers = [
     "tiktoken>=0.12.0",

@@ -8,6 +8,7 @@ from contextlib import redirect_stdout
 from datetime import date
 from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 from forgeloop.banner import ASCII_BANNER, ORANGE, RESET, is_ascii, render_intro
 from forgeloop.cli import main
@@ -24,6 +25,7 @@ from forgeloop.core import (
 )
 from forgeloop.doctor import doctor_report
 from forgeloop.opencli import (
+    CommandRun,
     opencli_plan,
     opencli_status,
     parse_node_engine_major,
@@ -234,6 +236,34 @@ class SecretsTests(unittest.TestCase):
                 else:
                     os.environ["FORGELOOP_CONFIG_HOME"] = previous
 
+    def test_external_secrets_init_rejects_dangling_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repository"
+            root.mkdir()
+            (root / ".env.example").write_text("FORGELOOP_TEST_KEY=\n", encoding="utf-8")
+            target = Path(tmp) / "external-secrets.env"
+            target.symlink_to(Path(tmp) / "missing-target.env")
+
+            with patch("forgeloop.secrets.external_secrets_path", return_value=target):
+                with self.assertRaisesRegex(ValueError, "symlink"):
+                    init_external_secrets(root)
+
+    def test_external_secrets_path_must_be_a_regular_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repository"
+            root.mkdir()
+            (root / ".env.example").write_text("FORGELOOP_TEST_KEY=\n", encoding="utf-8")
+            target = Path(tmp) / "external-secrets.env"
+            target.mkdir()
+
+            with patch("forgeloop.secrets.external_secrets_path", return_value=target):
+                with self.assertRaisesRegex(ValueError, "regular file"):
+                    init_external_secrets(root)
+                status = check_secrets(root)
+
+        self.assertFalse(status.exists)
+        self.assertTrue(any("not a regular file" in warning for warning in status.warnings))
+
     def test_precompact_always_recommends_capture(self) -> None:
         result = simulate_hook_event(Path(__file__).resolve().parents[1], "PreCompact", {})
 
@@ -395,6 +425,80 @@ class OpenCLITests(unittest.TestCase):
 
         self.assertFalse(result["executed"])
         self.assertEqual("dry-run", result["status"])
+
+    def test_opencli_install_verifies_plugin_command_list(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        plan = {
+            "status": {
+                "node": {"ready": True},
+                "npm": {"ready": True, "path": "npm"},
+                "plugin_source": {"ready": True, "reason": ""},
+            }
+        }
+        calls: list[list[str]] = []
+
+        def run(executable: str, args: list[str], timeout: int) -> CommandRun:
+            calls.append([executable, *args])
+            return CommandRun([executable, *args], 0, "", "")
+
+        with (
+            patch("forgeloop.opencli.opencli_plan", return_value=plan),
+            patch("forgeloop.opencli.shutil.which", return_value="opencli"),
+            patch("forgeloop.opencli._run_fixed", side_effect=run),
+        ):
+            result = run_opencli_install(root, execute=True)
+
+        self.assertEqual("ok", result["status"])
+        self.assertEqual(
+            [
+                ["npm", "install", "-g", "@jackwener/opencli@latest"],
+                ["opencli", "plugin", "install", str(root / "integrations/opencli")],
+                ["opencli", "--version"],
+                ["opencli", "list", "-f", "json"],
+            ],
+            calls,
+        )
+
+    def test_opencli_install_stops_when_plugin_install_fails(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        plan = {
+            "status": {
+                "node": {"ready": True},
+                "npm": {"ready": True, "path": "npm"},
+                "plugin_source": {"ready": True, "reason": ""},
+            }
+        }
+        calls: list[list[str]] = []
+
+        def run(executable: str, args: list[str], timeout: int) -> CommandRun:
+            calls.append([executable, *args])
+            exit_code = 1 if args[:2] == ["plugin", "install"] else 0
+            return CommandRun([executable, *args], exit_code, "", "")
+
+        with (
+            patch("forgeloop.opencli.opencli_plan", return_value=plan),
+            patch("forgeloop.opencli.shutil.which", return_value="opencli"),
+            patch("forgeloop.opencli._run_fixed", side_effect=run),
+        ):
+            result = run_opencli_install(root, execute=True)
+
+        self.assertEqual("failed", result["status"])
+        self.assertEqual(2, len(calls))
+
+    def test_opencli_status_rejects_symlinked_plugin_source(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repository"
+            source = Path(tmp) / "outside-plugin"
+            (root / "integrations").mkdir(parents=True)
+            source.mkdir()
+            (source / "opencli-plugin.json").write_text("{}\n", encoding="utf-8")
+            (root / "integrations/opencli").symlink_to(source, target_is_directory=True)
+
+            with patch("forgeloop.opencli.shutil.which", return_value=None):
+                status = opencli_status(root)
+
+        self.assertFalse(status["plugin_source"]["ready"])
+        self.assertIn("symlinks", status["plugin_source"]["reason"])
 
     def test_opencli_status_cli_outputs_package(self) -> None:
         root = Path(__file__).resolve().parents[1]
