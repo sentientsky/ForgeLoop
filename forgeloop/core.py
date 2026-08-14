@@ -23,6 +23,7 @@ REQUIRED_FILES = [
     "CODE_OF_CONDUCT.md",
     "GOVERNANCE.md",
     ".github/copilot-instructions.md",
+    ".github/CODEOWNERS",
     ".github/PULL_REQUEST_TEMPLATE.md",
     ".github/dependabot.yml",
     ".github/workflows/ci.yml",

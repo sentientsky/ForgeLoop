@@ -22,6 +22,7 @@ ForgeLoop follows practical semantic versioning:
 - fixed the ignore rules so the Claude Build skill is included in fresh clones
 - hardened external-secret writes against dangling symlinks and made OpenCLI install verification match its published plan
 - raised the release validation tool floor to Twine 7 for current Core Metadata compatibility
+- prepared the public repository identity, metadata URLs, security contact, and code-owner routing for `sentientsky/ForgeLoop`
 
 ## 0.1.0 - Public Release Foundation
 

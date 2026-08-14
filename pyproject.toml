@@ -8,6 +8,7 @@ license = "MIT"
 authors = [
     { name = "ForgeLoop contributors" }
 ]
+urls = { Homepage = "https://github.com/sentientsky/ForgeLoop", Documentation = "https://github.com/sentientsky/ForgeLoop/tree/main/docs", Issues = "https://github.com/sentientsky/ForgeLoop/issues", Source = "https://github.com/sentientsky/ForgeLoop" }
 keywords = [
     "ai",
     "claude-code",

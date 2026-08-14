@@ -2,6 +2,8 @@
 
 This guide covers the one-time steps that require the repository owner's GitHub account.
 
+Target repository: `https://github.com/sentientsky/ForgeLoop`
+
 ## 1. Prepare The Local Repository
 
 Run the release gate in `RELEASE_GUIDE.md`. Confirm the primary branch is `main`:
@@ -15,36 +17,57 @@ The second command is needed only when the branch has another name.
 
 ## 2. Create And Push The Repository
 
-With GitHub CLI:
+### Create It In The Browser
+
+On the GitHub page shown in the launch screenshot, use:
+
+- Owner: `sentientsky`
+- Repository name: `ForgeLoop`
+- Description: `An open source operating system for disciplined AI-assisted engineering.`
+- Visibility: `Public`
+- Add README: `Off`
+- Add .gitignore: `No .gitignore`
+- Add licence: leave the existing local `MIT Licence` unchanged by selecting `No licence` here
+
+Click **Create repository**. Do not initialise the remote with a README, `.gitignore`, or licence because ForgeLoop already has them.
+
+### Connect And Push The Existing Local Repository
+
+After GitHub shows the empty repository page, run these commands from the ForgeLoop folder:
+
+```bash
+git remote add origin https://github.com/sentientsky/ForgeLoop.git
+git remote -v
+git push -u origin main
+```
+
+If GitHub asks you to sign in, complete the browser prompt. Use Git Credential Manager or GitHub CLI authentication. Do not paste a personal access token into the repository, a command transcript, or any ForgeLoop file.
+
+### Alternative: GitHub CLI
 
 ```bash
 gh auth login
 gh repo create ForgeLoop --public --source . --remote origin --push
 ```
 
-Or create an empty public repository on GitHub, then run:
-
-```bash
-git remote add origin https://github.com/YOUR_ACCOUNT/ForgeLoop.git
-git push -u origin main
-```
-
-Do not initialise the remote with another README, licence, or `.gitignore`; ForgeLoop already contains them.
-
 ## 3. Replace Repository-Specific Values
 
-Add the final `project.urls` block described in `MAINTAINER_GUIDE.md` to `pyproject.toml`.
+The local launch configuration is already prepared with the `sentientsky/ForgeLoop` URLs:
 
-Add this repository-specific contact to `.github/ISSUE_TEMPLATE/config.yml`:
+- `pyproject.toml` has the homepage, documentation, issues, and source URLs.
+- `.github/ISSUE_TEMPLATE/config.yml` has the private security-advisory link.
+- `.github/CODEOWNERS` routes repository review requests to `@sentientsky`.
+
+After the first push, verify the security link opens this repository's advisory form:
 
 ```yaml
 contact_links:
   - name: Security issue
-    url: https://github.com/YOUR_ACCOUNT/ForgeLoop/security/advisories/new
+    url: https://github.com/sentientsky/ForgeLoop/security/advisories/new
     about: Follow SECURITY.md. Do not publish exploit details in public issues.
 ```
 
-Add `.github/CODEOWNERS` only after the real maintainer account or team is known. Invalid placeholder owners weaken review routing.
+The public package metadata deliberately keeps the author as `ForgeLoop contributors`. An email address is not required for GitHub, PyPI, or project ownership. Configure your Git email locally only if you want future commits attributed to that address.
 
 ## 4. Protect `main`
 
@@ -78,7 +101,7 @@ Create a protected GitHub environment named `pypi`. Add a required reviewer when
 
 In PyPI, add a Trusted Publisher with:
 
-- the final GitHub owner
+- GitHub owner `sentientsky`
 - repository `ForgeLoop`
 - workflow `release.yml`
 - environment `pypi`

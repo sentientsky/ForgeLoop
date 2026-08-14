@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_by": "forgeloop 0.1.0",
-  "record_count": 28,
+  "record_count": 29,
   "records": [
     {
       "path": "docs/captures/2026-04-17-external-secrets-outside-repository.md",
@@ -233,6 +233,23 @@
         "public-status"
       ],
       "valid_from": "2026-07-26",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-08-14-public-repository-identity.md",
+      "title": "Capture: Public Repository Identity",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "github",
+        "release",
+        "governance",
+        "ownership",
+        "security"
+      ],
+      "valid_from": "2026-08-14",
       "valid_to": "",
       "supersedes": "",
       "superseded_by": ""

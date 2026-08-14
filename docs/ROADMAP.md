@@ -30,9 +30,6 @@ These cannot be completed safely without the final GitHub owner or organisation:
 
 - create the public GitHub repository
 - push the `main` branch
-- add final `project.urls` to `pyproject.toml`
-- add the repository-specific private security advisory link
-- add `.github/CODEOWNERS` with real maintainers or teams
 - enable branch protection, security features, and required checks
 - configure PyPI Trusted Publishing
 - create the first signed or reviewed release tag

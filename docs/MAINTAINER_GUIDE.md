@@ -60,14 +60,12 @@ Mention:
 
 ## Package Metadata
 
-Do not add project URLs until the public GitHub repository path is final.
-
-After the repository exists, add:
+The final project URLs are prepared locally for the first push:
 
 ```toml
 [project.urls]
-Homepage = "https://github.com/YOUR_ACCOUNT/ForgeLoop"
-Documentation = "https://github.com/YOUR_ACCOUNT/ForgeLoop/tree/main/docs"
-Issues = "https://github.com/YOUR_ACCOUNT/ForgeLoop/issues"
-Source = "https://github.com/YOUR_ACCOUNT/ForgeLoop"
+Homepage = "https://github.com/sentientsky/ForgeLoop"
+Documentation = "https://github.com/sentientsky/ForgeLoop/tree/main/docs"
+Issues = "https://github.com/sentientsky/ForgeLoop/issues"
+Source = "https://github.com/sentientsky/ForgeLoop"
 ```

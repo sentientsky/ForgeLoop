@@ -1,2 +1,5 @@
 blank_issues_enabled: false
-# Add the repository-specific private advisory link during docs/GITHUB_SETUP.md.
+contact_links:
+  - name: Security issue
+    url: https://github.com/sentientsky/ForgeLoop/security/advisories/new
+    about: Follow SECURITY.md. Do not publish exploit details in public issues.
