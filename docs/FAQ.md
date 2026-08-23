@@ -8,6 +8,14 @@ No. Claude Code has the richest native support through skills and agents, but Fo
 
 No. ForgeLoop keeps only `.env.example` in the repository. Real secrets live outside the repo.
 
+## Does ForgeLoop store personal data or make compliance claims?
+
+No. ForgeLoop rejects personal data in Git-tracked memory Markdown. It can check governance metadata that points to an external store and keep a local metadata-only, hash-chained audit log. It is not legal advice, a compliance certification, or proof of deletion from third-party systems. Read `governance/README.md`.
+
+## Can ForgeLoop prove a right-to-erasure request is complete?
+
+Not on its own. The audit log can record the governance event, but every embedding store, graph, cache, backup, export, provider, Git history, fork, and replica must be handled separately. Record erasure only after the responsible providers supply appropriate evidence.
+
 ## Does ForgeLoop make token usage lower?
 
 ForgeLoop reduces memory loading by using pointer-first context packets. Use `python -m forgeloop tokens "<query>" .` to measure a specific task. Do not make public percentage claims without the command output.

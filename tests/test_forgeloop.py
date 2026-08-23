@@ -24,6 +24,7 @@ from forgeloop.core import (
     validate_repo,
 )
 from forgeloop.doctor import doctor_report
+from forgeloop.governance import audit_governed_memory, record_audit_event, verify_audit_log
 from forgeloop.opencli import (
     CommandRun,
     opencli_plan,
@@ -46,6 +47,120 @@ class FrontmatterTests(unittest.TestCase):
         self.assertEqual(data["status"], "current")
         self.assertEqual(data["tags"], ["memory", "safety"])
         self.assertIn("# Title", body)
+
+
+class GovernanceTests(unittest.TestCase):
+    def test_governed_memory_audit_accepts_external_personal_data_pointer(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            note = root / "docs/captures/governed-pointer.md"
+            note.parent.mkdir(parents=True)
+            note.write_text(
+                "---\n"
+                "type: capture\n"
+                "status: current\n"
+                "data_classification: internal\n"
+                "governed_content_classification: personal\n"
+                "subject_ref: SUBJ-EXAMPLE-001\n"
+                "jurisdiction: GB\n"
+                "purpose: support\n"
+                "lawful_basis: contract\n"
+                "provenance_source: user-provided\n"
+                "provenance_recorded_at: 2026-08-23\n"
+                "retention_until: 2027-08-23\n"
+                "storage_ref: STORE-EXTERNAL-001\n"
+                "tags: [governed-memory]\n"
+                "---\n"
+                "# External pointer\n\nOnly an opaque external reference is stored here.\n",
+                encoding="utf-8",
+            )
+
+            report = audit_governed_memory(root, today=date(2026, 8, 23))
+
+        self.assertTrue(report["ok"])
+        self.assertEqual(1, report["governed_records"])
+
+    def test_governed_memory_audit_rejects_personal_data_in_repository(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            note = root / "docs/captures/unsafe-memory.md"
+            note.parent.mkdir(parents=True)
+            note.write_text(
+                "---\n"
+                "type: capture\n"
+                "data_classification: personal\n"
+                "tags: [governed-memory]\n"
+                "---\n"
+                "# Unsafe record\n",
+                encoding="utf-8",
+            )
+
+            report = audit_governed_memory(root)
+
+        self.assertFalse(report["ok"])
+        self.assertIn("personal-data-in-repository", {item["code"] for item in report["errors"]})
+        self.assertEqual("docs/captures/unsafe-memory.md", report["errors"][0]["path"])
+
+    def test_governance_audit_log_hashes_references_and_detects_tampering(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repository"
+            root.mkdir()
+            governance_home = Path(tmp) / "governance-home"
+            with patch.dict(os.environ, {"FORGELOOP_GOVERNANCE_HOME": str(governance_home)}):
+                result = record_audit_event(
+                    root,
+                    action="collect",
+                    actor_ref="OPERATOR-001",
+                    record_ref="STORE-EXTERNAL-001",
+                    subject_ref="SUBJ-EXAMPLE-001",
+                )
+                valid_status = verify_audit_log(root)
+                audit_log = next((governance_home / "governance/audit").glob("*.jsonl"))
+                raw_log = audit_log.read_text(encoding="utf-8")
+                audit_log.write_text(raw_log.replace("collect", "erase"), encoding="utf-8")
+                invalid_status = verify_audit_log(root)
+
+        self.assertTrue(result["recorded"])
+        self.assertTrue(valid_status["valid"])
+        self.assertEqual(1, valid_status["event_count"])
+        self.assertNotIn("SUBJ-EXAMPLE-001", raw_log)
+        self.assertFalse(invalid_status["valid"])
+
+    def test_governance_log_refuses_personal_identifiers(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(ValueError):
+                record_audit_event(
+                    Path(tmp),
+                    action="access",
+                    actor_ref="OPERATOR-001",
+                    record_ref="STORE-EXTERNAL-001",
+                    subject_ref="person@example.com",
+                )
+
+    def test_governance_log_refuses_storage_inside_repository(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with patch.dict(os.environ, {"FORGELOOP_GOVERNANCE_HOME": str(root)}):
+                with self.assertRaises(ValueError):
+                    record_audit_event(
+                        root,
+                        action="access",
+                        actor_ref="OPERATOR-001",
+                        record_ref="STORE-EXTERNAL-001",
+                    )
+
+    def test_secrets_init_cli_does_not_echo_external_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repository"
+            root.mkdir()
+            (root / ".env.example").write_text("FORGELOOP_TEST_KEY=\n", encoding="utf-8")
+            output = StringIO()
+            with patch.dict(os.environ, {"FORGELOOP_CONFIG_HOME": str(Path(tmp) / "config-home")}), redirect_stdout(output):
+                self.assertEqual(0, main(["secrets", "init", str(root), "--json"]))
+
+        self.assertIn('"external": true', output.getvalue())
+        self.assertNotIn("external_path", output.getvalue())
+        self.assertNotIn(str(root), output.getvalue())
 
 
 class BannerTests(unittest.TestCase):
@@ -134,6 +249,18 @@ class ValidationTests(unittest.TestCase):
             self.assertIn("workflow-write-all", codes)
             self.assertIn("workflow-permissions", codes)
             self.assertIn("unpinned-action", codes)
+
+    def test_validation_catches_public_url_placeholders(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "README.md").write_text(
+                "Source: https://github.com/<YOUR_ACCOUNT>/ForgeLoop\n",
+                encoding="utf-8",
+            )
+
+            findings = validate_repo(root)
+
+        self.assertIn("public-url-placeholder", {finding.code for finding in findings})
 
 
 class NewNoteTests(unittest.TestCase):

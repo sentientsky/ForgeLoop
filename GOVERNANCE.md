@@ -2,6 +2,8 @@
 
 ForgeLoop is maintained in public. This document explains how changes are reviewed and who may approve them.
 
+Repository governance is separate from governed memory. For retention, provenance, audit events, and erasure boundaries, read `docs/governance/README.md` and `docs/standards/governed-memory-standard.md`.
+
 ## Roles
 
 - Contributors report issues, improve documentation, propose designs, and open pull requests.

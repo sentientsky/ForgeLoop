@@ -59,6 +59,8 @@ jobs:
           python -m forgeloop pack "memory validation" . --limit 5
           python -m forgeloop tokens "memory validation" . --limit 5
           python -m forgeloop secrets check .
+          python -m forgeloop governance audit .
+          python -m forgeloop governance verify .
           python -m forgeloop index . --check
       - name: Build and check distributions
         run: |

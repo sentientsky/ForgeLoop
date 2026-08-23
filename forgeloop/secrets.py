@@ -24,7 +24,7 @@ class SecretsCheck:
 
     def as_dict(self, root: Path) -> dict[str, Any]:
         return {
-            "external_path": str(self.external_path),
+            "external_location": "outside_repository",
             "exists": self.exists,
             "repo_env_files": [str(path.relative_to(root)) for path in self.repo_env_files],
             "keys": self.keys,

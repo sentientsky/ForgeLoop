@@ -197,6 +197,22 @@ python -m forgeloop secrets check .
 
 ForgeLoop keeps only `.env.example` in the repo. Real `.env`-style files should live outside the project folder.
 
+## Governed Memory
+
+Do not put personal information in ForgeLoop Markdown notes, Git commits, prompts, or audit events.
+
+When a project needs to point to personal or special-category data stored in an external provider, start with `templates/governed-memory-template.md` and run:
+
+```bash
+python -m forgeloop governance audit .
+python -m forgeloop governance log access . --actor-ref OPERATOR-001 --record-ref STORE-EXTERNAL-001 --subject-ref SUBJ-EXAMPLE-001
+python -m forgeloop governance verify .
+```
+
+The metadata must record the provenance, purpose, lawful basis, jurisdiction, retention deadline, and external storage reference. `subject_ref` must be an opaque identifier, never a name, email address, phone number, or account ID.
+
+ForgeLoop cannot delete data from third-party embeddings, graphs, backups, or Git history. Obtain evidence from every store before recording an `erase` event. Read `docs/governance/README.md` for the full boundary.
+
 ## OpenCLI Integration
 
 OpenCLI is optional.
@@ -256,6 +272,8 @@ python -m forgeloop tokens "memory validation" . --limit 5
 python -m forgeloop index .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
+python -m forgeloop governance audit .
+python -m forgeloop governance verify .
 python -m compileall forgeloop tests
 ```
 

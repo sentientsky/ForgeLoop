@@ -139,6 +139,8 @@ Do not delete outdated facts if they may matter later. Mark them as superseded a
 
 Never store secrets, access tokens, passwords, private keys, or sensitive personal data in memory.
 
+When a task touches personal data, provenance, retention, audit events, external memory stores, or erasure, use `governance-reviewer`. Keep Git-tracked Markdown free of personal data, use opaque references only, and run `python -m forgeloop governance audit .` before completion. Do not claim legal compliance or third-party erasure unless the required provider evidence exists.
+
 ## Token Economy Rules
 
 ForgeLoop should reduce context load before it adds automation.

@@ -7,6 +7,7 @@ from typing import Any
 
 from .compat import compatibility_report
 from .core import build_memory_index, repo_status, validate_repo
+from .governance import audit_governed_memory, verify_audit_log
 from .opencli import opencli_status
 from .secrets import check_secrets
 from .setup import LOCAL_SETUP_FILE
@@ -77,6 +78,29 @@ def doctor_report(root: Path) -> dict[str, Any]:
             "json_path": str(index.json_path.relative_to(root)),
             "markdown_path": str(index.markdown_path.relative_to(root)),
         },
+    )
+
+    governance = audit_governed_memory(root)
+    _add(
+        checks,
+        "governed-memory",
+        "error" if governance["errors"] else "warn" if governance["warnings"] else "ok",
+        "Governed-memory metadata is valid."
+        if governance["ok"]
+        else "Governed-memory metadata needs attention.",
+        {
+            "governed_records": governance["governed_records"],
+            "errors": len(governance["errors"]),
+            "warnings": len(governance["warnings"]),
+        },
+    )
+    audit_log = verify_audit_log(root)
+    _add(
+        checks,
+        "governance-audit-log",
+        "ok" if audit_log["valid"] else "error",
+        audit_log["reason"],
+        {"exists": audit_log["exists"], "event_count": audit_log["event_count"]},
     )
 
     status = repo_status(root)

@@ -14,6 +14,8 @@ python -m forgeloop doctor .
 python -m forgeloop compat .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
+python -m forgeloop governance audit .
+python -m forgeloop governance verify .
 python -m build
 python -m twine check dist/*
 python tests/package_smoke.py dist .
@@ -26,6 +28,7 @@ python tests/package_smoke.py dist .
 3. Compatibility with Claude Code and Codex.
 4. Token measurement honesty.
 5. Beginner clarity.
+6. Governed-memory boundaries and evidence.
 
 ## Issue Triage
 
@@ -39,6 +42,7 @@ python tests/package_smoke.py dist .
 - Review security and dependency alerts weekly.
 - Triage new issues and pull requests at least weekly.
 - Review compatibility notes and AI tool instructions monthly.
+- Review governed-memory retention deadlines and external-store deletion evidence before making a public compliance claim.
 - Refresh clean-session compatibility evidence before each minor release.
 - Remove stale memory only through a superseding capture or decision record.
 

@@ -16,6 +16,8 @@ python -m forgeloop doctor .
 python -m forgeloop compat .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
+python -m forgeloop governance audit .
+python -m forgeloop governance verify .
 python -m forgeloop tokens "release readiness" . --limit 5
 python -m build
 python -m twine check dist/*
@@ -42,6 +44,8 @@ python -m forgeloop opencli plan . --fetch-npm --with-skills --run-doctor
 - GitHub Actions use full commit SHA pins.
 - The release tag matches the package version.
 - Governance approval requirements are satisfied.
+- Governed-memory metadata is valid and no personal data appears in Git-tracked memory.
+- Any completed erasure claim has evidence from every affected external store.
 
 ## Git Steps
 
@@ -81,6 +85,7 @@ Avoid:
 - fixed percentage claims without benchmark evidence
 - claims that all tool integrations are deeply verified
 - claims that OpenCLI is bundled
+- claims of GDPR, EU AI Act, HIPAA, SOC 2, or third-party erasure compliance without appropriate evidence
 
 ## Release Notes Template
 

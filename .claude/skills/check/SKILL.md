@@ -31,6 +31,7 @@ Use these reviewers when relevant:
 - `api-contract-reviewer`
 - `data-reviewer`
 - `adversarial-reviewer`
+- `governance-reviewer` for any personal-data, retention, audit, erasure, or external-memory change
 
 ## Steps
 

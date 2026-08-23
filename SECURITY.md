@@ -31,6 +31,14 @@ ForgeLoop is especially careful about:
 - generated indexes leaking local paths
 - version drift between docs, package, and examples
 - optional browser bridges and global tool installs
+- personal or special-category data in Git-tracked memory notes
+- audit records that expose raw identifiers, content, or secrets
+
+## Governed Memory Boundary
+
+ForgeLoop's repository memory is not a personal-data store. Store only opaque references in governed Markdown metadata and keep the data itself in an external provider with its own access control, retention, export, and deletion controls.
+
+Use `python -m forgeloop governance audit .` before committing governed-memory metadata. The local governance audit log is hash-chained and metadata-only; it is not an encryption system, legal certification, or proof that third-party embeddings, graphs, backups, or Git history have been erased.
 
 ## Current Status
 

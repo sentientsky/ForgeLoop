@@ -23,6 +23,10 @@ ForgeLoop follows practical semantic versioning:
 - hardened external-secret writes against dangling symlinks and made OpenCLI install verification match its published plan
 - raised the release validation tool floor to Twine 7 for current Core Metadata compatibility
 - prepared the public repository identity, metadata URLs, security contact, and code-owner routing for `sentientsky/ForgeLoop`
+- removed routine external-secrets paths from CLI and JSON status output to prevent sensitive-path disclosures
+- added governed-memory metadata checks for provenance, lawful basis, jurisdiction, retention, and opaque external-store pointers
+- added an external metadata-only, tamper-evident governance audit log with hash-chain verification
+- documented strict boundaries: no personal data in Git-tracked memory, no certification claim, and no unsupported claim of third-party erasure completion
 
 ## 0.1.0 - Public Release Foundation
 

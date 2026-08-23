@@ -18,6 +18,13 @@ from .core import (
     validate_repo,
 )
 from .doctor import doctor_report, format_doctor_report
+from .governance import (
+    audit_governed_memory,
+    format_governance_audit,
+    format_governance_log_status,
+    record_audit_event,
+    verify_audit_log,
+)
 from .opencli import (
     DEFAULT_INSTALL_TIMEOUT,
     format_opencli_install_result,
@@ -145,6 +152,38 @@ def main(argv: list[str] | None = None) -> int:
     secrets_check = secrets_subparsers.add_parser("check", help="check repo and external secrets state")
     secrets_check.add_argument("root", nargs="?", default=".", help="repository root")
     secrets_check.add_argument("--json", action="store_true", help="print machine-readable output")
+
+    governance_parser = subparsers.add_parser(
+        "governance",
+        help="audit governed memory metadata and local audit events",
+    )
+    governance_subparsers = governance_parser.add_subparsers(dest="governance_command", required=True)
+    governance_audit = governance_subparsers.add_parser(
+        "audit",
+        help="check governed memory metadata without reading external data stores",
+    )
+    governance_audit.add_argument("root", nargs="?", default=".", help="repository root")
+    governance_audit.add_argument("--json", action="store_true", help="print machine-readable output")
+    governance_log = governance_subparsers.add_parser(
+        "log",
+        help="record a metadata-only governance event in the external audit log",
+    )
+    governance_log.add_argument(
+        "action",
+        choices=["collect", "access", "update", "export", "share", "erase", "retention-review"],
+        help="governance action to record",
+    )
+    governance_log.add_argument("root", nargs="?", default=".", help="repository root")
+    governance_log.add_argument("--actor-ref", required=True, help="opaque operator reference, not a name or email")
+    governance_log.add_argument("--record-ref", required=True, help="opaque record reference, not a file path")
+    governance_log.add_argument("--subject-ref", help="optional opaque subject reference, not personal data")
+    governance_log.add_argument("--json", action="store_true", help="print machine-readable output")
+    governance_verify = governance_subparsers.add_parser(
+        "verify",
+        help="verify the external governance audit hash chain",
+    )
+    governance_verify.add_argument("root", nargs="?", default=".", help="repository root")
+    governance_verify.add_argument("--json", action="store_true", help="print machine-readable output")
 
     args = parser.parse_args(argv)
 
@@ -334,9 +373,9 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Could not initialise secrets: {exc}", file=sys.stderr)
                 return 1
             if args.json:
-                print(json.dumps({"path": str(path), "created_or_exists": True}, indent=2))
+                print(json.dumps({"external": True, "created_or_exists": True}, indent=2))
             else:
-                print(f"External secrets file ready: {path}")
+                print("External secrets file is ready outside the repository.")
             return 0
 
         if args.secrets_command == "check":
@@ -344,7 +383,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.json:
                 print(json.dumps(status.as_dict(root), indent=2))
             else:
-                print(f"External secrets file: {status.external_path}")
+                print("External secrets location: outside the repository")
                 print(f"Exists: {status.exists}")
                 print(f"Keys: {len(status.keys)}")
                 if status.repo_env_files:
@@ -356,6 +395,41 @@ def main(argv: list[str] | None = None) -> int:
                     for warning in status.warnings:
                         print(f"- {warning}")
             return 1 if status.repo_env_files else 0
+
+    if args.command == "governance":
+        if args.governance_command == "audit":
+            report = audit_governed_memory(root)
+            if args.json:
+                print(json.dumps(report, indent=2))
+            else:
+                print(format_governance_audit(report))
+            return 1 if report["errors"] else 0
+
+        if args.governance_command == "log":
+            try:
+                event = record_audit_event(
+                    root,
+                    action=args.action,
+                    actor_ref=args.actor_ref,
+                    record_ref=args.record_ref,
+                    subject_ref=args.subject_ref,
+                )
+            except (OSError, ValueError) as exc:
+                print(f"Could not record governance event: {exc}", file=sys.stderr)
+                return 1
+            if args.json:
+                print(json.dumps(event, indent=2))
+            else:
+                print(f"Governance event recorded: {event['event_fingerprint']}")
+            return 0
+
+        if args.governance_command == "verify":
+            status = verify_audit_log(root)
+            if args.json:
+                print(json.dumps(status, indent=2))
+            else:
+                print(format_governance_log_status(status))
+            return 0 if status["valid"] else 1
 
     parser.print_help(sys.stderr)
     return 2

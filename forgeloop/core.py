@@ -18,6 +18,7 @@ REQUIRED_FILES = [
     "README.md",
     "CLAUDE.md",
     "AGENTS.md",
+    ".claude/agents/governance-reviewer.md",
     "GEMINI.md",
     "CHANGELOG.md",
     "CODE_OF_CONDUCT.md",
@@ -50,7 +51,9 @@ REQUIRED_FILES = [
     "docs/PUBLISHING.md",
     "docs/MAINTAINER_GUIDE.md",
     "docs/GITHUB_SETUP.md",
+    "docs/governance/README.md",
     "docs/integrations/opencli.md",
+    "docs/standards/governed-memory-standard.md",
     "integrations/opencli/opencli-plugin.json",
     "tests/package_smoke.py",
 ]
@@ -80,6 +83,7 @@ REQUIRED_DIRS = [
     "docs/compatibility",
     "docs/compatibility/deployment-evals",
     "docs/integrations",
+    "docs/governance",
     "docs/language",
     "docs/decisions",
     "docs/benchmarks",
@@ -138,6 +142,14 @@ ALLOWED_NOTE_KINDS = {
 ALLOWED_HOOK_EVENTS = {"Stop", "PreCompact", "SessionEnd"}
 SAFE_IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9_.-]{1,120}$")
 PINNED_ACTION_RE = re.compile(r"^[0-9a-f]{40}$", re.IGNORECASE)
+GITHUB_URL_PLACEHOLDER_RE = re.compile(
+    r"https?://(?:www\.)?github\.com/(?:<[^>/]+>|\[[^]/]+\]|your[-_a-z0-9]*)",
+    re.IGNORECASE,
+)
+ACCOUNT_PLACEHOLDER_RE = re.compile(
+    r"(?:<|\[)(?:your[-_ ]?(?:github[-_ ]?)?(?:account|username|owner|organisation|organization)|github[-_ ]?account)(?:>|\])",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -235,6 +247,7 @@ def validate_repo(root: Path) -> list[Finding]:
     findings.extend(_validate_json_files(root))
     findings.extend(_validate_directory_safety(root))
     findings.extend(_validate_file_safety(root))
+    findings.extend(_validate_public_urls(root))
     findings.extend(_validate_github_workflows(root))
     findings.extend(_validate_cursor_rules(root))
     findings.extend(_validate_native_tool_profiles(root))
@@ -643,6 +656,29 @@ def _validate_file_safety(root: Path) -> list[Finding]:
         if path.suffix.lower() in {".sh", ".ps1"} or ".claude/hooks" in path.as_posix() or is_claude_settings:
             if _contains_risky_command(text):
                 findings.append(Finding("error", "risky-hook", "Risky hook command pattern found", path))
+    return findings
+
+
+def _validate_public_urls(root: Path) -> list[Finding]:
+    """Reject placeholder account values before public metadata is published."""
+    findings: list[Finding] = []
+    text_extensions = {".md", ".toml", ".yml", ".yaml", ".json", ".txt"}
+    for path in _iter_files(root):
+        if path.is_symlink() or path.suffix.lower() not in text_extensions:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if GITHUB_URL_PLACEHOLDER_RE.search(text) or ACCOUNT_PLACEHOLDER_RE.search(text):
+            findings.append(
+                Finding(
+                    "error",
+                    "public-url-placeholder",
+                    "Replace placeholder account or GitHub URL text before publishing.",
+                    path,
+                )
+            )
     return findings
 
 

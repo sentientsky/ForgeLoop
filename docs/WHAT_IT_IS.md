@@ -41,6 +41,7 @@ It is a small operating system with:
 - specialist reviewers
 - measured context packets
 - local-first memory
+- governance-first metadata checks for externally stored personal data
 - release health checks
 - explicit optional integrations
 
@@ -77,6 +78,7 @@ ForgeLoop is not:
 - a secret store
 - an automatic browser agent
 - a promise of fixed token savings
+- legal, regulatory, or vendor-erasure certification
 - a copy of another memory system
 
 ## Public Release Position
@@ -84,4 +86,3 @@ ForgeLoop is not:
 The public MVP is local-first and dependency-light.
 
 Optional integrations such as OpenCLI are integrated as peer tools and require explicit user action before install.
-

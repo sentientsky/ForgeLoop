@@ -25,6 +25,7 @@ ForgeLoop gives the assistant:
 - specialist reviewer agents
 - templates for every stage
 - local-first project memory
+- governance-first metadata checks and local audit-event verification
 - secure secrets handling
 - validation commands
 - release health checks
@@ -129,6 +130,17 @@ python -m forgeloop opencli install . --execute
 ```
 
 Browser-backed OpenCLI commands reuse logged-in browser sessions, so ForgeLoop treats them as privileged actions.
+
+## Governed Memory
+
+ForgeLoop does not put personal data into Git-tracked memory files. It can validate the provenance, purpose, lawful basis, jurisdiction, retention deadline, and external-store pointer for governed metadata.
+
+```bash
+python -m forgeloop governance audit .
+python -m forgeloop governance verify .
+```
+
+The local audit log is metadata-only and tamper-evident. ForgeLoop does not claim legal certification or completion of third-party erasure requests.
 
 ## Open Source Positioning
 

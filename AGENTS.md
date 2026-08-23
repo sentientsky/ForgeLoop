@@ -46,6 +46,8 @@ python -m forgeloop tokens "memory validation" . --limit 5
 python -m forgeloop index .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
+python -m forgeloop governance audit .
+python -m forgeloop governance verify .
 python -m forgeloop pack "memory validation" . --limit 5
 ```
 
@@ -61,6 +63,8 @@ python -m forgeloop index .
 - Prefer small, reversible changes.
 - Keep the repository dependency-light.
 - Keep secrets outside the repository.
+- Keep personal data outside Git-tracked memory and use opaque references for governed metadata.
+- Do not claim compliance or third-party erasure without provider-specific evidence.
 - Do not add active hooks unless they are reviewed, tested, and opt-in.
 - Do not edit generated memory indexes by hand.
 - Use `python -m forgeloop setup .` to select a local tool profile.

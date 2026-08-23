@@ -83,6 +83,17 @@ The memory model has five parts:
 
 This keeps memory useful without turning it into a flat pile of notes.
 
+## Governance-First Memory
+
+ForgeLoop keeps repository memory free of personal data. When a project needs to reference governed information held elsewhere, it can validate provenance, purpose, lawful basis, jurisdiction, retention, and an opaque external-store reference:
+
+```bash
+python -m forgeloop governance audit .
+python -m forgeloop governance verify .
+```
+
+The optional local audit log is metadata-only and hash-chained. It is not a claim of legal certification or proof that a third-party embedding, graph, cache, backup, or Git history has been erased. Read `docs/governance/README.md` before using governed-memory metadata.
+
 ## Repository Map
 
 ```text
@@ -308,6 +319,8 @@ These skills load only when useful.
 Use `hook-simulate` to dry-run future capture hook behaviour without executing commands or reading transcript files.
 
 Use `secrets init` to create a local secrets file outside the repository. The repo keeps only `.env.example` with blank values. Real `.env`-style files inside the repo fail validation.
+
+Use `governance audit` to check governed-memory metadata before it is committed. The audit rejects personal data in Git-tracked Markdown and keeps any audit trail outside the repository.
 
 In CI, use:
 

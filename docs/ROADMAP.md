@@ -6,7 +6,7 @@ This page separates what is already built from what still needs repository-owner
 
 ForgeLoop is locally release-ready for a first public GitHub push.
 
-The repository now includes the five-stage workflow, Claude Code skills, portable Codex guidance, multi-tool compatibility profiles, memory palace structure, Forge Context Packets, measured token reporting, external secrets handling, optional OpenCLI integration, release workflows, CodeQL, Scorecard, governance, issue templates, and an installed-wheel smoke test.
+The repository now includes the five-stage workflow, Claude Code skills, portable Codex guidance, multi-tool compatibility profiles, memory palace structure, Forge Context Packets, measured token reporting, external secrets handling, optional OpenCLI integration, release workflows, CodeQL, Scorecard, repository governance, governed-memory metadata checks, a local tamper-evident audit log, issue templates, and an installed-wheel smoke test.
 
 Current local proof commands:
 
@@ -19,6 +19,8 @@ python -m forgeloop doctor .
 python -m forgeloop compat .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
+python -m forgeloop governance audit .
+python -m forgeloop governance verify .
 python -m build
 python -m twine check dist/*
 python tests/package_smoke.py dist .
@@ -47,6 +49,7 @@ These are the next improvements after public launch:
 - add a worktree lifecycle command in dry-run mode before any automated writes
 - package optional integrations only after install and uninstall behaviour is tested
 - publish a small docs site once repository URLs are final
+- define and test provider adapters for external stores that can return scoped erasure evidence across embeddings, graphs, caches, and backups
 
 ## Contribution Direction
 

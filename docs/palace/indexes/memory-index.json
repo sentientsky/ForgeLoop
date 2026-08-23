@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_by": "forgeloop 0.1.0",
-  "record_count": 29,
+  "record_count": 30,
   "records": [
     {
       "path": "docs/captures/2026-04-17-external-secrets-outside-repository.md",
@@ -267,6 +267,24 @@
         "validation"
       ],
       "valid_from": "2026-08-14",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-08-23-governed-memory-foundation.md",
+      "title": "Governed Memory Foundation",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "governance",
+        "memory",
+        "privacy",
+        "retention",
+        "provenance",
+        "security"
+      ],
+      "valid_from": "2026-08-23",
       "valid_to": "",
       "supersedes": "",
       "superseded_by": ""
