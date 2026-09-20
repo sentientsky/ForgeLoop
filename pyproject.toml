@@ -45,7 +45,7 @@ forgeloop = "forgeloop.cli:main"
 dev = [
     "build>=1.2.0",
     "coverage[toml]>=7.14.0",
-    "ruff>=0.15.0",
+    "ruff>=0.16.8",
     "twine>=7.0.0",
 ]
 tokenizers = [
