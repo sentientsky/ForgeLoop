@@ -6,6 +6,7 @@ ForgeLoop's public repository is [sentientsky/ForgeLoop](https://github.com/sent
 
 - `main` requires a pull request and passing Python 3.10-3.14 CI, package-quality, CodeQL, and fuzz checks.
 - Branch protection is enforced for administrators; force-push and branch deletion are disabled; review conversations must be resolved.
+- An active `v*` tag ruleset blocks version-tag updates and deletion. Release tags are intentionally immutable.
 - Required independent approvals remain at zero while there is one active maintainer. This is a disclosed solo-maintainer compromise, not equivalent to independent review. Add a second maintainer and raise the requirement to one approval before treating the process as team-reviewed.
 - Dependabot alerts/security updates, secret scanning, push protection, and private vulnerability reporting are enabled.
 - Scorecard notices about project age, review history, and the OpenSSF Best Practices badge are maturity signals, not confirmed source vulnerabilities.

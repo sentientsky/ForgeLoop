@@ -10,7 +10,7 @@ Do not run `pip install forgeloop` from the public package index. Use the GitHub
 
 ## GitHub Source Release
 
-The tag-triggered workflow verifies the release, builds a source archive from tracked files, checks for local-only secret files, creates a SHA-256 checksum, attests the archive, and creates a GitHub Release. A retry compares existing release assets byte-for-byte and fails closed if an asset differs. The Python wheel is built and smoke-tested internally but is not attached or published.
+The tag-triggered workflow verifies the release, builds a source archive from tracked files, checks for local-only secret files, creates a SHA-256 checksum, attests the archive, and creates a GitHub Release. A retry compares existing release assets byte-for-byte and fails closed if an asset differs. The Python wheel is built and smoke-tested internally but is not attached or published. An active repository ruleset prevents `v*` tags from being updated or deleted, so never reuse a published version tag; release corrections require a new version.
 
 Before tagging:
 

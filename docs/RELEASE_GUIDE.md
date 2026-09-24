@@ -37,6 +37,7 @@ Optional live OpenCLI checks must be explicit and run only in an approved test a
 - The memory index is current and governed-memory metadata is valid.
 - Open security findings and Dependabot PRs are reviewed; a green workflow alone is not approval.
 - Release tag matches `pyproject.toml` version.
+- The release tag is unused. Version tags are protected from updates and deletion; corrections require a new version and tag.
 - The source archive contains the full tracked project and passes the archive safety check.
 - The release includes a matching SHA-256 checksum; the archive attestation verifies against the expected repository.
 - Legal, certification, and third-party erasure claims have appropriate evidence and review.

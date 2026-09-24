@@ -2,7 +2,7 @@
 
 ## Current Status
 
-ForgeLoop is a public GitHub source alpha. The repository is intended to be used as a starter template for a new project. Its local CLI selects a tool profile and checks repository files; it does not merge ForgeLoop into an existing project or prove that an external AI tool loaded the profile.
+ForgeLoop is a public GitHub source alpha. The repository is configured as a starter template, and the `v0.1.0` source release is published. Its local CLI selects a tool profile and checks repository files; it does not merge ForgeLoop into an existing project or prove that an external AI tool loaded the profile.
 
 The current source includes the five-stage workflow, Claude Code skills, portable tool instruction profiles, memory palace structure, Forge Context Packets, measured token reporting, external secrets handling, optional OpenCLI integration, release checks, CodeQL, fuzzing, GitHub governance, and governed-memory metadata checks.
 
