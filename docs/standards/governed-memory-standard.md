@@ -64,3 +64,5 @@ Before completing an erasure request:
 5. Keep only the minimum metadata needed to evidence the request, subject to the project retention policy.
 
 ForgeLoop cannot perform or prove these third-party deletions on its own. Never describe a deletion as complete based only on the ForgeLoop audit log.
+
+New `erase` events require `--evidence-ref`, an opaque identifier for evidence held outside ForgeLoop. The event stores only a hash of that identifier. This is an operator attestation and does not validate the evidence, contact a provider, or establish that all replicas were erased. Existing `FGA/1` events remain verifiable but are not retroactively evidence-backed.

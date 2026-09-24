@@ -25,6 +25,8 @@ ForgeLoop is not a legal-compliance certification, a hosted privacy service, or 
 
 The hash chain is tamper-evident, not tamper-proof. A project must still secure its operating-system account, govern every downstream store, set its own retention periods, and obtain legal advice for its use case.
 
+ForgeLoop currently has no external memory-store connector or provider-specific deletion adapter. An `erase` audit event is an operator attestation, not provider verification. The current CLI requires an opaque `--evidence-ref` for new erasure events and hashes that reference into the log; the supporting evidence stays in the provider's controlled system or another approved evidence store. ForgeLoop cannot inspect that evidence or prove it is complete.
+
 ## Using Governed Metadata
 
 Start from `templates/governed-memory-template.md`. The Markdown file is an internal pointer, never the personal data itself.
@@ -44,5 +46,15 @@ The governance audit checks metadata only. It does not read, index, transmit, or
 Do not put personal data in Git-tracked files. Removing a file from a working tree does not erase prior Git commits, forks, clones, build artefacts, or third-party stores.
 
 An external memory provider must implement and evidence deletion across every copy it controls before a project can describe a request as complete. Record the resulting `erase` event only after the provider has returned its own deletion evidence.
+
+```bash
+python -m forgeloop governance log erase . \
+  --actor-ref OPERATOR-001 \
+  --record-ref STORE-EXTERNAL-001 \
+  --subject-ref SUBJ-EXAMPLE-001 \
+  --evidence-ref EVIDENCE-PACKET-001
+```
+
+`evidence_ref` is only an opaque pointer. Do not put provider receipts, personal data, URLs, credentials, or file paths into the audit log. The `FGA/2` format remains able to verify existing `FGA/1` logs; legacy erase entries do not gain evidence retroactively.
 
 Read `../standards/governed-memory-standard.md` before enabling a governed memory provider.

@@ -184,6 +184,10 @@ def main(argv: list[str] | None = None) -> int:
     governance_log.add_argument("--actor-ref", required=True, help="opaque operator reference, not a name or email")
     governance_log.add_argument("--record-ref", required=True, help="opaque record reference, not a file path")
     governance_log.add_argument("--subject-ref", help="optional opaque subject reference, not personal data")
+    governance_log.add_argument(
+        "--evidence-ref",
+        help="required for erase: opaque reference to provider evidence stored outside this log",
+    )
     governance_log.add_argument("--json", action="store_true", help="print machine-readable output")
     governance_verify = governance_subparsers.add_parser(
         "verify",
@@ -432,6 +436,7 @@ def main(argv: list[str] | None = None) -> int:
                     actor_ref=args.actor_ref,
                     record_ref=args.record_ref,
                     subject_ref=args.subject_ref,
+                    evidence_ref=args.evidence_ref,
                 )
             except (OSError, ValueError) as exc:
                 print(f"Could not record governance event: {exc}", file=sys.stderr)

@@ -10,6 +10,8 @@ ForgeLoop follows practical semantic versioning:
 
 ## Unreleased
 
+- require an opaque evidence reference for new governed-memory erasure audit events, with backward-compatible verification of existing logs
+- record clean-session CLI acceptance evidence and explicitly keep production promotion on hold pending Claude authentication and independent human review
 - added preview-first, no-overwrite profile adoption for existing repositories, with rollback on failed writes
 - expanded hosted Python test coverage to Ubuntu, Windows, and macOS
 - clarified that Codex compatibility requires `AGENTS.md`, while a project README is optional
