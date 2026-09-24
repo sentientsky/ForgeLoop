@@ -64,10 +64,11 @@ python -m forgeloop secrets check .
 ```bash
 python -m forgeloop governance audit .
 python -m forgeloop governance log collect . --actor-ref OPERATOR-001 --record-ref STORE-EXTERNAL-001 --subject-ref SUBJ-EXAMPLE-001
+python -m forgeloop governance log erase . --actor-ref OPERATOR-001 --record-ref STORE-EXTERNAL-001 --subject-ref SUBJ-EXAMPLE-001 --evidence-ref EVIDENCE-PACKET-001
 python -m forgeloop governance verify .
 ```
 
-Use only opaque references. The audit log is local, outside the repository, and stores hashes rather than the references or personal data.
+Use only opaque references. New `erase` events require `--evidence-ref`; the audit log hashes that reference and cannot verify provider evidence. The log is local, outside the repository, and stores no raw references or personal data.
 
 ## Hooks
 

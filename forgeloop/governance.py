@@ -13,7 +13,8 @@ from typing import Any
 
 from .core import MAX_FILE_BYTES, MEMORY_FOLDERS, parse_frontmatter
 
-AUDIT_SCHEMA_VERSION = "FGA/1"
+AUDIT_SCHEMA_VERSION = "FGA/2"
+LEGACY_AUDIT_SCHEMA_VERSION = "FGA/1"
 MAX_AUDIT_LOG_BYTES = 5_000_000
 MAX_AUDIT_LINE_BYTES = 16_000
 ALLOWED_ACTIONS = {"collect", "access", "update", "export", "share", "erase", "retention-review"}
@@ -92,6 +93,7 @@ def record_audit_event(
     actor_ref: str,
     record_ref: str,
     subject_ref: str | None = None,
+    evidence_ref: str | None = None,
 ) -> dict[str, Any]:
     """Append a tamper-evident, metadata-only audit event outside the repository."""
     root = root.resolve()
@@ -99,6 +101,14 @@ def record_audit_event(
     clean_actor = _validate_opaque_reference(actor_ref, "actor reference")
     clean_record = _validate_opaque_reference(record_ref, "record reference")
     clean_subject = None if subject_ref is None else _validate_opaque_reference(subject_ref, "subject reference")
+    if clean_action == "erase":
+        if evidence_ref is None:
+            raise ValueError("An erase event requires an opaque reference to provider deletion evidence")
+        clean_evidence = _validate_opaque_reference(evidence_ref, "evidence reference")
+    elif evidence_ref is not None:
+        raise ValueError("An evidence reference is only accepted for an erase event")
+    else:
+        clean_evidence = None
     log_path = _audit_log_path(root)
 
     with _audit_lock(log_path):
@@ -114,6 +124,7 @@ def record_audit_event(
             "actor_ref_hash": _hash_reference("actor", clean_actor),
             "record_ref_hash": _hash_reference("record", clean_record),
             "subject_ref_hash": _hash_reference("subject", clean_subject) if clean_subject else "",
+            "evidence_ref_hash": _hash_reference("evidence", clean_evidence) if clean_evidence else "",
             "previous_event_hash": previous_hash,
         }
         event["event_hash"] = _hash_event(event)
@@ -487,7 +498,7 @@ def _hash_event(event: dict[str, Any]) -> str:
 
 def _audit_chain_error(events: list[dict[str, Any]]) -> str:
     previous_hash = ""
-    required_keys = {
+    legacy_keys = {
         "schema_version",
         "event_id",
         "occurred_at",
@@ -499,13 +510,19 @@ def _audit_chain_error(events: list[dict[str, Any]]) -> str:
         "event_hash",
     }
     for index, event in enumerate(events, start=1):
+        schema_version = event.get("schema_version")
+        if schema_version == LEGACY_AUDIT_SCHEMA_VERSION:
+            required_keys = legacy_keys
+        elif schema_version == AUDIT_SCHEMA_VERSION:
+            required_keys = legacy_keys | {"evidence_ref_hash"}
+        else:
+            return f"Audit event {index} has an unsupported schema version."
         if set(event) != required_keys:
             return f"Audit event {index} has an unsupported schema."
-        if event.get("schema_version") != AUDIT_SCHEMA_VERSION:
-            return f"Audit event {index} has an unsupported schema version."
         if not isinstance(event.get("event_id"), str) or not AUDIT_EVENT_ID_RE.fullmatch(event["event_id"]):
             return f"Audit event {index} has an invalid event identifier."
-        if event.get("action") not in ALLOWED_ACTIONS:
+        action = event.get("action")
+        if not isinstance(action, str) or action not in ALLOWED_ACTIONS:
             return f"Audit event {index} has an unsupported action."
         if not _is_timestamp(event.get("occurred_at")):
             return f"Audit event {index} has an invalid timestamp."
@@ -516,6 +533,12 @@ def _audit_chain_error(events: list[dict[str, Any]]) -> str:
             value = event.get(key)
             if not isinstance(value, str) or (value and not SHA256_RE.fullmatch(value)):
                 return f"Audit event {index} has an invalid {key}."
+        if schema_version == AUDIT_SCHEMA_VERSION:
+            evidence_hash = event["evidence_ref_hash"]
+            if not isinstance(evidence_hash, str) or (evidence_hash and not SHA256_RE.fullmatch(evidence_hash)):
+                return f"Audit event {index} has an invalid evidence_ref_hash."
+            if (event["action"] == "erase") != bool(evidence_hash):
+                return f"Audit event {index} has an inconsistent erasure evidence reference."
         if event["previous_event_hash"] != previous_hash:
             return f"Audit event {index} breaks the event chain."
         if event["event_hash"] != _hash_event(event):

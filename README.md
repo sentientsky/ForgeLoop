@@ -92,7 +92,7 @@ python -m forgeloop governance audit .
 python -m forgeloop governance verify .
 ```
 
-The optional local audit log is metadata-only and hash-chained. It is not a claim of legal certification or proof that a third-party embedding, graph, cache, backup, or Git history has been erased. Read `docs/governance/README.md` before using governed-memory metadata.
+The optional local audit log is metadata-only and hash-chained. New `erase` entries require an opaque pointer to evidence held outside ForgeLoop, but the log remains operator-attested and cannot verify third-party deletion. ForgeLoop has no provider deletion adapters and makes no legal-certification or erasure-completion claim. Read `docs/governance/README.md` before using governed-memory metadata.
 
 ## Repository Map
 
