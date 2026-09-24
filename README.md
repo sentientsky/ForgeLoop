@@ -291,6 +291,10 @@ Use `compat` to check whether the expected Claude Code, Codex, Cursor, Copilot, 
 
 Use `doctor` as the fuller release health check. It combines structure validation, compatibility, secrets state, memory-index freshness, CI readiness, optional tokenizer availability, and OpenCLI integration status.
 
+## GitHub Security Checks
+
+The public repository runs CI on Python 3.10 through 3.14, CodeQL analysis, and a bounded seeded fuzz session for the frontmatter parser. GitHub workflow actions are pinned to commit hashes, and CI/build tools are installed from hash-locked requirements. Dependabot security alerts and updates, secret scanning with push protection, and private vulnerability reporting are enabled. `main` requires a pull request and passing CI, CodeQL, and fuzz checks. These controls reduce risk; they do not prove the absence of defects.
+
 Use `setup` to choose a local AI coding tool profile. It writes `.forgeloop.local.json`, which is ignored by Git. Use `--dry-run` to preview without writing.
 
 Use `opencli plan` to preview the optional OpenCLI integration. OpenCLI is integrated as an external peer plugin, not copied into ForgeLoop. Install only when you explicitly choose:

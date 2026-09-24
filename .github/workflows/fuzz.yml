@@ -1,0 +1,35 @@
+name: Fuzz
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fuzz-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: .github/requirements-fuzz.txt
+      - name: Install fuzzer
+        run: python -m pip install --require-hashes -r .github/requirements-fuzz.txt
+      - name: Fuzz the frontmatter parser
+        run: >-
+          python fuzz/fuzz_frontmatter.py fuzz/corpus/frontmatter
+          -atheris_runs=20000 -seed=20260924 -max_len=65536

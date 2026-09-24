@@ -5,7 +5,8 @@ This guide is for people preparing ForgeLoop for public use.
 ## Routine Checks
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install --require-hashes -r .github/requirements-ci.txt
+python -m pip install --no-deps --no-build-isolation -e .
 python -m ruff check forgeloop tests
 python -m coverage run -m unittest discover -s tests
 python -m coverage report
@@ -16,9 +17,27 @@ python -m forgeloop index . --check
 python -m forgeloop secrets check .
 python -m forgeloop governance audit .
 python -m forgeloop governance verify .
-python -m build
+python -m build --no-isolation
 python -m twine check dist/*
 python tests/package_smoke.py dist .
+```
+
+## Locked CI Dependencies
+
+GitHub workflows install development and build tools from hash-locked files. To update the locks after changing `.github/requirements-ci.in` or `.github/requirements-fuzz.in`, install a reviewed `uv` release and run:
+
+```bash
+uv pip compile --generate-hashes --universal --python-version 3.10 --output-file .github/requirements-ci.txt .github/requirements-ci.in
+uv pip compile --generate-hashes --python-version 3.14 --python-platform x86_64-unknown-linux-gnu --output-file .github/requirements-fuzz.txt .github/requirements-fuzz.in
+```
+
+Review the complete diff, including versions, markers, and hashes. Do not remove `--require-hashes` from workflow install commands. CI itself checks Python 3.10 through 3.14.
+
+The `Fuzz` workflow runs a bounded, seeded Atheris session against the frontmatter parser. Reproduce it locally on Linux or macOS after installing the exact fuzzer lock:
+
+```bash
+python -m pip install --require-hashes -r .github/requirements-fuzz.txt
+python fuzz/fuzz_frontmatter.py fuzz/corpus/frontmatter -atheris_runs=20000 -seed=20260924 -max_len=65536
 ```
 
 ## Review Priorities

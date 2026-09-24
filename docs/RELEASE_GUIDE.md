@@ -7,7 +7,8 @@ Use this guide before publishing ForgeLoop to GitHub.
 Run:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install --require-hashes -r .github/requirements-ci.txt
+python -m pip install --no-deps --no-build-isolation -e .
 python -m ruff check forgeloop tests
 python -m coverage run -m unittest discover -s tests
 python -m coverage report
@@ -19,7 +20,7 @@ python -m forgeloop secrets check .
 python -m forgeloop governance audit .
 python -m forgeloop governance verify .
 python -m forgeloop tokens "release readiness" . --limit 5
-python -m build
+python -m build --no-isolation
 python -m twine check dist/*
 python tests/package_smoke.py dist .
 ```

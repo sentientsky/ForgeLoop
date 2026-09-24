@@ -12,7 +12,7 @@ ForgeLoop is an early open source project. Please report security issues respons
 
 ## Reporting A Vulnerability
 
-If you find a security issue, use private vulnerability reporting or open a private security advisory on GitHub once the repository is public. Include affected versions, reproduction steps, impact, and any suggested mitigation.
+If you find a security issue, use [private vulnerability reporting](https://github.com/sentientsky/ForgeLoop/security/advisories/new). Include affected versions, reproduction steps, impact, and any suggested mitigation.
 
 Until then, do not publish exploit details in public issues.
 

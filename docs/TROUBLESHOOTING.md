@@ -85,8 +85,8 @@ Check:
 Build locally:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install --require-hashes -r .github/requirements-ci.txt
+python -m pip install --no-deps --no-build-isolation -e .
 python -m build
 python -m twine check dist/*
 ```
-

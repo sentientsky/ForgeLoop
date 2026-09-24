@@ -11,8 +11,9 @@ tags: [github, codeql, scorecard, release, security]
 
 - Public repository: `sentientsky/ForgeLoop`
 - Default branch: `main`
-- Published commits: `0fb3fbc` (governance-first memory controls), `26e1349` (Scorecard permission scope)
-- GitHub code scanning reported zero alerts across all states during this review; scheduled CodeQL runs passed.
+- Audited commit at the start: `00c8768`
+- CI, CodeQL, and Scorecard all passed on `00c8768`; earlier failed runs were corrected and remain visible in workflow history.
+- The current open Scorecard findings included branch protection, un-hash-pinned CI installs, and no detected fuzzer. These are repository posture findings, not CodeQL source alerts.
 
 ## Scorecard Failure
 
@@ -30,7 +31,7 @@ Local validation passed after these fixes: 47 unit tests, 73 percent branch cove
 
 ## Evidence Still Needed
 
-The corrected workflow needs one green push run to close this review. Scorecard's low scores for branch protection, project age, reviewed changes, and fuzzing describe repository maturity and settings, not a source-code vulnerability. Do not attempt to inflate these scores with artificial PR history.
+The follow-up implementation now hash-locks CI and release tooling, runs bounded Atheris fuzzing, enables Dependabot alerts/security updates and private vulnerability reporting, and protects `main` with required PR checks. Scorecard's project-age, review-history, OpenSSF badge, and language-detection signals cannot be honestly cleared by changing source code or creating artificial history. Python fuzzing is real and tested here, but Scorecard's detector does not currently recognise this Python integration.
 
 ## Source
 

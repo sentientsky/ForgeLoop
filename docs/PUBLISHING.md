@@ -5,8 +5,9 @@ ForgeLoop should use PyPI Trusted Publishing rather than long-lived API tokens.
 ## Local Build Check
 
 ```bash
-python -m pip install -e ".[dev]"
-python -m build
+python -m pip install --require-hashes -r .github/requirements-ci.txt
+python -m pip install --no-deps --no-build-isolation -e .
+python -m build --no-isolation
 python -m twine check dist/*
 python tests/package_smoke.py dist .
 ```

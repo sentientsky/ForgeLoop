@@ -71,25 +71,28 @@ The public package metadata deliberately keeps the author as `ForgeLoop contribu
 
 ## 4. Protect `main`
 
-Create a branch ruleset for `main`:
+`main` is now protected with a pull-request-only rule, enforced for administrators. The rule requires all CI, CodeQL, and fuzz checks to pass, resolves review conversations, requires linear history, and blocks force pushes and branch deletion. It currently requires zero approvals so the sole maintainer can merge a PR that passes all checks without a second account. Do not merge your own PR if you have an independent reviewer available. When a second maintainer joins, raise the approval requirement to one and require CODEOWNERS review.
 
-- require a pull request before merging
-- require at least one approval
-- dismiss stale approvals after new commits
-- require all conversations to be resolved
-- require the CI and CodeQL checks that appear after the first workflow run
-- block force pushes and branch deletion
-- allow bypass only for an emergency maintainer role
+Required checks:
 
-Do not enable automatic approval. Auto-merge is acceptable only after every required check and human approval has completed.
+- `test (3.10)` through `test (3.14)`
+- `quality-and-package`
+- `analyse` (CodeQL)
+- `fuzz`
+
+Keep bypass disabled. A green check is necessary but does not replace human review when another maintainer is available.
+
+CodeQL runs on pull requests and a weekly schedule. This permits analysis results to upload for Dependabot PRs while avoiding push-triggered analysis runs with Dependabot's read-only token. Scorecard runs weekly, when branch-protection settings change, or when manually dispatched by a maintainer.
+
+Automatic approval is not enabled. Auto-merge is currently off; consider it only after a second maintainer can provide independent review and every required check passes.
 
 ## 5. Enable Security Features
 
 In repository settings, enable every feature available to the account:
 
-- Dependabot alerts and security updates
+- Dependabot alerts and security updates (enabled)
 - secret scanning and push protection
-- private vulnerability reporting
+- private vulnerability reporting (enabled)
 - CodeQL code scanning
 - dependency graph
 

@@ -28,6 +28,11 @@ ForgeLoop follows practical semantic versioning:
 - pinned Scorecard to the verified upstream commit behind its annotated v2.4.3 tag
 - replaced annotated CodeQL action tag-object pins with the verified v4.36.2 commit
 - scoped CodeQL security-event publishing permission to its analysis job
+- replaced floating GitHub workflow tool installs with cross-platform hash-locked requirements
+- added a bounded seeded Atheris workflow for frontmatter parser fuzzing
+- enabled GitHub Dependabot alerts, security updates, and private vulnerability reporting
+- configured Dependabot to monitor the hash-locked GitHub tooling requirements
+- protected `main` with required pull requests, CI, CodeQL, fuzz checks, linear history, and no force-push or deletion
 - updated Python code to satisfy current Ruff diagnostics and narrowed optional-tokenizer error handling
 - added governed-memory metadata checks for provenance, lawful basis, jurisdiction, retention, and opaque external-store pointers
 - added an external metadata-only, tamper-evident governance audit log with hash-chain verification

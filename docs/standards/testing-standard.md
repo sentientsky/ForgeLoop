@@ -46,6 +46,10 @@ The GitHub Actions workflow should run on:
 - Python 3.10
 - Python 3.11
 - Python 3.12
+- Python 3.13
+- Python 3.14
+
+The `Fuzz` workflow runs a bounded Atheris fuzz session on the frontmatter parser for pull requests and pushes to `main`. Preserve a stable seed corpus, time limit, and maximum input size. Atheris coverage-guided fuzzing complements, but does not replace, deterministic unit tests.
 
 ## Test Philosophy
 

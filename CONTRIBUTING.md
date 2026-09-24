@@ -61,7 +61,8 @@ Dependabot and AI-authored changes use the same process. See `GOVERNANCE.md` for
 Install the development tools, then run:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install --require-hashes -r .github/requirements-ci.txt
+python -m pip install --no-deps --no-build-isolation -e .
 python -m ruff check forgeloop tests
 python -m coverage run -m unittest discover -s tests
 python -m coverage report
@@ -70,7 +71,7 @@ python -m forgeloop doctor .
 python -m forgeloop compat .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
-python -m build
+python -m build --no-isolation
 python -m twine check dist/*
 python tests/package_smoke.py dist .
 ```
