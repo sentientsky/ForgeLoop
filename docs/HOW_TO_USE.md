@@ -43,7 +43,7 @@ The supported options are:
 
 The menu also shows coming-soon tools so you can see the roadmap.
 
-The menu records your local tool preference; it does not install or merge ForgeLoop into another repository. See `docs/INSTALLATION.md` before using an existing project.
+The menu records your local tool preference; it does not install files. To preview adding the selected tool's allowlisted profile files to an existing project, run `python -m forgeloop adopt ../my-project --tool codex` from a ForgeLoop source checkout. Add `--apply` only after reviewing the preview. Existing conflicts are preserved; this does not install the full CLI/runtime or manage future updates. See `docs/INSTALLATION.md` for the complete boundary.
 
 For a non-interactive preview:
 

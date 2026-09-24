@@ -19,6 +19,18 @@ python -m forgeloop setup . --list
 python -m forgeloop setup . --tool codex --dry-run
 ```
 
+## Adopt A Tool Profile
+
+Run these from a ForgeLoop source checkout. Preview is the default; `--apply` adds missing files without overwriting conflicts.
+
+```bash
+python -m forgeloop adopt ../my-project --tool claude-code
+python -m forgeloop adopt ../my-project --tool claude-code --apply
+python -m forgeloop adopt ../my-project --tool all-supported --apply
+```
+
+This adds profile entry files only. It does not install the CLI/runtime into the destination or provide automatic updates/uninstall.
+
 ## Memory
 
 ```bash

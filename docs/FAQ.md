@@ -26,11 +26,11 @@ No. ForgeLoop integrates OpenCLI as an optional peer plugin. OpenCLI installs on
 
 ## Can beginners use it?
 
-Yes, for a new project created from the GitHub template. Start with `docs/INSTALLATION.md` and `docs/GETTING_STARTED.md`. ForgeLoop does not yet have a conflict-aware installer for existing repositories.
+Yes. The GitHub template is the complete distribution. Existing repositories can use the preview-first `adopt` command to add allowlisted tool entry files without overwriting conflicts, but that does not install the full CLI/runtime or provide managed updates.
 
 ## Can I install it into an existing project?
 
-Not automatically. The setup menu records a local tool choice but does not copy or merge ForgeLoop files. Follow `docs/INSTALLATION.md`; adapt files deliberately and resolve conflicts yourself.
+Use `python -m forgeloop adopt PATH --tool TOOL` from a ForgeLoop source checkout to preview, then add `--apply` to copy absent profile files. Existing differences are preserved and reported. The `setup` command only records a local preference; it does not install files. The adopter does not merge conflicts or install the complete ForgeLoop CLI/runtime.
 
 ## Can I run `pip install forgeloop`?
 

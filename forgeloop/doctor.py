@@ -139,7 +139,7 @@ def doctor_report(root: Path) -> dict[str, Any]:
         checks,
         "ci",
         "ok" if ci_ok else "warn",
-        "CI runs tests, coverage, lint, validation, and an isolated wheel smoke test."
+        "CI runs Python tests on Ubuntu, Windows, and macOS, plus lint, validation, and an isolated wheel smoke test."
         if ci_ok
         else "CI workflow is missing or incomplete.",
         {"path": ".github/workflows/ci.yml"},

@@ -43,10 +43,10 @@ COMPATIBILITY_TARGETS = [
         "priority": "primary",
         "required": [
             "AGENTS.md",
-            "README.md",
             "pyproject.toml",
         ],
         "optional": [
+            "README.md",
             "docs/compatibility/ai-coding-tools.md",
             "docs/WHAT_IT_IS.md",
             "docs/GETTING_STARTED.md",
