@@ -6,8 +6,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from .compat import compatibility_report, format_compatibility_report
 from .banner import render_intro
+from .compat import compatibility_report, format_compatibility_report
 from .context import build_context_pack, render_context_pack
 from .core import (
     build_memory_index,
@@ -449,5 +449,5 @@ def _load_json_payload(input_path: str | None) -> dict:
         text = path.read_text(encoding="utf-8")
     payload = json.loads(text)
     if not isinstance(payload, dict):
-        raise ValueError("JSON input must be an object")
+        raise TypeError("JSON input must be an object")
     return payload

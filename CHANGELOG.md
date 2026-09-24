@@ -25,6 +25,8 @@ ForgeLoop follows practical semantic versioning:
 - prepared the public repository identity, metadata URLs, security contact, and code-owner routing for `sentientsky/ForgeLoop`
 - removed routine external-secrets paths from CLI and JSON status output to prevent sensitive-path disclosures
 - scoped Scorecard publishing permissions to its analysis job so OpenSSF accepts the attested workflow
+- pinned Scorecard to the verified upstream commit behind its annotated v2.4.3 tag
+- updated Python code to satisfy current Ruff diagnostics and narrowed optional-tokenizer error handling
 - added governed-memory metadata checks for provenance, lawful basis, jurisdiction, retention, and opaque external-store pointers
 - added an external metadata-only, tamper-evident governance audit log with hash-chain verification
 - documented strict boundaries: no personal data in Git-tracked memory, no certification claim, and no unsupported claim of third-party erasure completion

@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
 SAFE_KEY_RE = re.compile(r"^[A-Z][A-Z0-9_]{1,79}$")
 SAFE_ENV_FILE_NAMES = {".env.example"}
 BLOCKED_ENV_FILE_NAMES = {".env", ".env.local", ".envrc", "secrets.env", "secret.env"}

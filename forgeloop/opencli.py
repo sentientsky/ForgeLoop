@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
 OPENCLI_PACKAGE = "@jackwener/opencli"
 OPENCLI_PACKAGE_LATEST = f"{OPENCLI_PACKAGE}@latest"
 OPENCLI_SKILLS_PACKAGE = "jackwener/opencli"

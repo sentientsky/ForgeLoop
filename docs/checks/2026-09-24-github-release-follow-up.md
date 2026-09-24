@@ -11,7 +11,7 @@ tags: [github, codeql, scorecard, release, security]
 
 - Public repository: `sentientsky/ForgeLoop`
 - Default branch: `main`
-- Published commit: `0fb3fbc` (governance-first memory controls)
+- Published commits: `0fb3fbc` (governance-first memory controls), `26e1349` (Scorecard permission scope)
 - GitHub code scanning reported zero alerts across all states during this review; scheduled CodeQL runs passed.
 
 ## Scorecard Failure
@@ -20,11 +20,17 @@ The scheduled Scorecard job was rejected by the Scorecard publishing service bec
 
 The workflow now keeps global `contents: read` and grants the three needed permissions only to the analysis job. ForgeLoop validation has a regression check for this scope boundary.
 
-Local validation passed: 47 unit tests, 73 percent branch coverage, Ruff, repository validation, doctor, compatibility, governance audit and log verification, secrets checks, package build, Twine checks, and installed-wheel smoke test.
+The next run showed that the action was pinned to the annotated tag object rather than the commit behind it. GitHub's API and the upstream Git ref both confirm `4eaacf0543bb3f2c246792bd56e8cdeffafb205a` as the peeled commit for `v2.4.3`; the workflow now pins that commit.
+
+## CI Lint Update
+
+CI installed Ruff 0.16.8 from the open-ended development dependency. The local machine previously had Ruff 0.15.18, which did not report the newer rules. The current source now passes Ruff 0.16.8, including stricter imports, timezone-aware dates, and narrower exception handling for optional tokenisation.
+
+Local validation passed after these fixes: 47 unit tests, 73 percent branch coverage, Ruff 0.16.8, repository validation, doctor, compatibility, governance audit and log verification, secrets checks, package build, Twine checks, and installed-wheel smoke test.
 
 ## Evidence Still Needed
 
-After this fix is pushed, confirm the Scorecard run succeeds. Its low scores for branch protection, project age, reviewed changes, and fuzzing describe repository maturity and settings, not a source-code vulnerability. Do not attempt to inflate these scores with artificial PR history.
+The corrected workflow needs one green push run to close this review. Scorecard's low scores for branch protection, project age, reviewed changes, and fuzzing describe repository maturity and settings, not a source-code vulnerability. Do not attempt to inflate these scores with artificial PR history.
 
 ## Source
 

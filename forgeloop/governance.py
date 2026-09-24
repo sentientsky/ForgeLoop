@@ -11,8 +11,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .core import MEMORY_FOLDERS, MAX_FILE_BYTES, parse_frontmatter
-
+from .core import MAX_FILE_BYTES, MEMORY_FOLDERS, parse_frontmatter
 
 AUDIT_SCHEMA_VERSION = "FGA/1"
 MAX_AUDIT_LOG_BYTES = 5_000_000
@@ -41,7 +40,7 @@ PERSONAL_DATA_HINT_RE = re.compile(
 def audit_governed_memory(root: Path, today: date | None = None) -> dict[str, Any]:
     """Validate governance metadata without exporting or indexing note contents."""
     root = root.resolve()
-    current_day = today or date.today()
+    current_day = today or datetime.now(timezone.utc).date()
     findings: list[dict[str, str]] = []
     governed_records = 0
 
@@ -396,7 +395,7 @@ class _AuditLock:
             with os.fdopen(fd, "w", encoding="utf-8") as handle:
                 handle.write(str(os.getpid()))
             self.acquired = True
-            return None
+            return
         raise OSError("Governance audit log is busy; retry the command")
 
     def __exit__(self, _exc_type: object, _exc: object, _traceback: object) -> None:
@@ -430,7 +429,7 @@ def _read_audit_events(log_path: Path) -> list[dict[str, Any]]:
             except json.JSONDecodeError as exc:
                 raise ValueError(f"Governance audit event {line_number} is invalid JSON") from exc
             if not isinstance(event, dict):
-                raise ValueError(f"Governance audit event {line_number} is not an object")
+                raise TypeError(f"Governance audit event {line_number} is not an object")
             events.append(event)
     return events
 
@@ -477,7 +476,7 @@ def _validate_opaque_reference(value: str, label: str) -> str:
 
 
 def _hash_reference(namespace: str, value: str) -> str:
-    return hashlib.sha256(f"{namespace}:{value}".encode("utf-8")).hexdigest()
+    return hashlib.sha256(f"{namespace}:{value}".encode()).hexdigest()
 
 
 def _hash_event(event: dict[str, Any]) -> str:

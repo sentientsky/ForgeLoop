@@ -24,7 +24,11 @@ from forgeloop.core import (
     validate_repo,
 )
 from forgeloop.doctor import doctor_report
-from forgeloop.governance import audit_governed_memory, record_audit_event, verify_audit_log
+from forgeloop.governance import (
+    audit_governed_memory,
+    record_audit_event,
+    verify_audit_log,
+)
 from forgeloop.opencli import (
     CommandRun,
     opencli_plan,
@@ -33,8 +37,18 @@ from forgeloop.opencli import (
     parse_node_major,
     run_opencli_install,
 )
-from forgeloop.secrets import check_secrets, external_secrets_path, init_external_secrets, parse_env_keys
-from forgeloop.setup import ALL_SUPPORTED_ID, SUPPORTED_TOOLS, run_setup, setup_menu_text
+from forgeloop.secrets import (
+    check_secrets,
+    external_secrets_path,
+    init_external_secrets,
+    parse_env_keys,
+)
+from forgeloop.setup import (
+    ALL_SUPPORTED_ID,
+    SUPPORTED_TOOLS,
+    run_setup,
+    setup_menu_text,
+)
 from forgeloop.tokens import build_token_report, format_token_report
 
 
@@ -127,27 +141,28 @@ class GovernanceTests(unittest.TestCase):
         self.assertFalse(invalid_status["valid"])
 
     def test_governance_log_refuses_personal_identifiers(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            with self.assertRaises(ValueError):
-                record_audit_event(
-                    Path(tmp),
-                    action="access",
-                    actor_ref="OPERATOR-001",
-                    record_ref="STORE-EXTERNAL-001",
-                    subject_ref="person@example.com",
-                )
+        with tempfile.TemporaryDirectory() as tmp, self.assertRaises(ValueError):
+            record_audit_event(
+                Path(tmp),
+                action="access",
+                actor_ref="OPERATOR-001",
+                record_ref="STORE-EXTERNAL-001",
+                subject_ref="person@example.com",
+            )
 
     def test_governance_log_refuses_storage_inside_repository(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            with patch.dict(os.environ, {"FORGELOOP_GOVERNANCE_HOME": str(root)}):
-                with self.assertRaises(ValueError):
-                    record_audit_event(
-                        root,
-                        action="access",
-                        actor_ref="OPERATOR-001",
-                        record_ref="STORE-EXTERNAL-001",
-                    )
+            with (
+                patch.dict(os.environ, {"FORGELOOP_GOVERNANCE_HOME": str(root)}),
+                self.assertRaises(ValueError),
+            ):
+                record_audit_event(
+                    root,
+                    action="access",
+                    actor_ref="OPERATOR-001",
+                    record_ref="STORE-EXTERNAL-001",
+                )
 
     def test_secrets_init_cli_does_not_echo_external_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -395,9 +410,11 @@ class SecretsTests(unittest.TestCase):
             target = Path(tmp) / "external-secrets.env"
             target.symlink_to(Path(tmp) / "missing-target.env")
 
-            with patch("forgeloop.secrets.external_secrets_path", return_value=target):
-                with self.assertRaisesRegex(ValueError, "symlink"):
-                    init_external_secrets(root)
+            with (
+                patch("forgeloop.secrets.external_secrets_path", return_value=target),
+                self.assertRaisesRegex(ValueError, "symlink"),
+            ):
+                init_external_secrets(root)
 
     def test_external_secrets_path_must_be_a_regular_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

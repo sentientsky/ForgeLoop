@@ -5,13 +5,12 @@ import os
 import re
 import tempfile
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
 from . import __version__
 from .secrets import find_repo_env_files
-
 
 MAX_FILE_BYTES = 1_000_000
 REQUIRED_FILES = [
@@ -311,7 +310,7 @@ def create_note(
 
     clean_title = _clean_title(title)
     slug = slugify(clean_title)
-    current_date = note_date or date.today()
+    current_date = note_date or datetime.now().astimezone().date()
     template_rel, output_rel, _type_name = ALLOWED_NOTE_KINDS[kind_key]
     template_path = _safe_join(root, template_rel)
     output_dir = _safe_join(root, output_rel)
@@ -359,7 +358,7 @@ def simulate_hook_event(
     if payload is None:
         payload = {}
     if not isinstance(payload, dict):
-        raise ValueError("Hook payload must be a JSON object")
+        raise TypeError("Hook payload must be a JSON object")
 
     session_id = _safe_session_id(payload.get("session_id", "unknown"))
     stop_hook_active = bool(payload.get("stop_hook_active", False))
@@ -576,7 +575,7 @@ def _validate_versions(root: Path) -> list[Finding]:
     findings: list[Finding] = []
     pyproject = root / "pyproject.toml"
     if pyproject.is_file():
-        match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject.read_text(encoding="utf-8"), re.M)
+        match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject.read_text(encoding="utf-8"), re.MULTILINE)
         if match and match.group(1) != __version__:
             findings.append(
                 Finding(
@@ -706,9 +705,11 @@ def _validate_file_safety(root: Path) -> list[Finding]:
         if _contains_secret(text):
             findings.append(Finding("error", "possible-secret", "Possible secret or token found", path))
         is_claude_settings = ".claude" in path.parts and path.name.startswith("settings")
-        if path.suffix.lower() in {".sh", ".ps1"} or ".claude/hooks" in path.as_posix() or is_claude_settings:
-            if _contains_risky_command(text):
-                findings.append(Finding("error", "risky-hook", "Risky hook command pattern found", path))
+        if (
+            (path.suffix.lower() in {".sh", ".ps1"} or ".claude/hooks" in path.as_posix() or is_claude_settings)
+            and _contains_risky_command(text)
+        ):
+            findings.append(Finding("error", "risky-hook", "Risky hook command pattern found", path))
     return findings
 
 
@@ -923,7 +924,7 @@ def _contains_risky_command(text: str) -> bool:
         r"chmod\s+777",
         r"shell\s*=\s*True",
     ]
-    return any(re.search(pattern, text, flags=re.I | re.S) for pattern in patterns)
+    return any(re.search(pattern, text, flags=re.IGNORECASE | re.DOTALL) for pattern in patterns)
 
 
 def _first_heading(body: str) -> str:

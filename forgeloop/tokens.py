@@ -7,7 +7,6 @@ from typing import Any
 from .context import DEFAULT_PACK_RECORDS, build_context_pack, render_context_pack
 from .core import MAX_FILE_BYTES, collect_memory_records
 
-
 TOOL_TOKEN_PROFILES = {
     "claude-code": {
         "label": "Claude Code",
@@ -171,12 +170,9 @@ def _count_for_profile(tool_id: str, text: str) -> TokenCount:
 def _count_with_tiktoken(text: str) -> int | None:
     try:
         import tiktoken  # type: ignore[import-not-found]
-    except Exception:
-        return None
-    try:
         encoding = tiktoken.get_encoding("o200k_base")
         return len(encoding.encode(text))
-    except Exception:
+    except (ImportError, LookupError, OSError, ValueError):
         return None
 
 

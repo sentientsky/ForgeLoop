@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 ORANGE = "\033[38;5;208m"
 RESET = "\033[0m"
 

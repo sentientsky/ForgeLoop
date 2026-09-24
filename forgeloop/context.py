@@ -6,7 +6,6 @@ from typing import Any
 
 from .core import collect_memory_records
 
-
 MAX_QUERY_CHARS = 500
 MAX_PACK_RECORDS = 20
 DEFAULT_PACK_RECORDS = 8
