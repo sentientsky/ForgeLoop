@@ -432,11 +432,12 @@ class SecretsTests(unittest.TestCase):
 
     def test_external_secrets_init_rejects_dangling_symlink(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp) / "repository"
+            temp_root = Path(tmp).resolve()
+            root = temp_root / "repository"
             root.mkdir()
             (root / ".env.example").write_text("FORGELOOP_TEST_KEY=\n", encoding="utf-8")
-            target = Path(tmp) / "external-secrets.env"
-            target.symlink_to(Path(tmp) / "missing-target.env")
+            target = temp_root / "external-secrets.env"
+            target.symlink_to(temp_root / "missing-target.env")
 
             with (
                 patch("forgeloop.secrets.external_secrets_path", return_value=target),
@@ -446,10 +447,11 @@ class SecretsTests(unittest.TestCase):
 
     def test_external_secrets_path_must_be_a_regular_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp) / "repository"
+            temp_root = Path(tmp).resolve()
+            root = temp_root / "repository"
             root.mkdir()
             (root / ".env.example").write_text("FORGELOOP_TEST_KEY=\n", encoding="utf-8")
-            target = Path(tmp) / "external-secrets.env"
+            target = temp_root / "external-secrets.env"
             target.mkdir()
 
             with patch("forgeloop.secrets.external_secrets_path", return_value=target):
