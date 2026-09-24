@@ -212,7 +212,7 @@ class GovernanceTests(unittest.TestCase):
                     "previous_event_hash": "",
                 }
                 legacy_event["event_hash"] = governance._hash_event(legacy_event)
-                audit_log = governance._audit_log_path(root)
+                audit_log = governance._audit_log_path(root.resolve())
                 audit_log.parent.mkdir(parents=True)
                 audit_log.write_text(json.dumps(legacy_event) + "\n", encoding="utf-8")
 
@@ -236,7 +236,7 @@ class GovernanceTests(unittest.TestCase):
             root = base / "repository"
             root.mkdir()
             with patch.dict(os.environ, {"FORGELOOP_GOVERNANCE_HOME": str(base / "config")}):
-                audit_log = governance._audit_log_path(root)
+                audit_log = governance._audit_log_path(root.resolve())
                 audit_log.parent.mkdir(parents=True)
                 malformed_event = {
                     "schema_version": "FGA/2",
