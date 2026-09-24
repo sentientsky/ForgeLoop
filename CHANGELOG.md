@@ -33,6 +33,7 @@ ForgeLoop follows practical semantic versioning:
 - enabled GitHub Dependabot alerts, security updates, and private vulnerability reporting
 - configured Dependabot to monitor the hash-locked GitHub tooling requirements
 - protected `main` with required pull requests, CI, CodeQL, fuzz checks, linear history, and no force-push or deletion
+- pinned GitHub Actions jobs to Ubuntu 24.04 to avoid floating runner-image transitions
 - updated Python code to satisfy current Ruff diagnostics and narrowed optional-tokenizer error handling
 - added governed-memory metadata checks for provenance, lawful basis, jurisdiction, retention, and opaque external-store pointers
 - added an external metadata-only, tamper-evident governance audit log with hash-chain verification
