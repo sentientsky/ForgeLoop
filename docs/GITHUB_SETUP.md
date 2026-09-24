@@ -82,7 +82,7 @@ Required checks:
 
 Keep bypass disabled. A green check is necessary but does not replace human review when another maintainer is available.
 
-CodeQL runs on pull requests and a weekly schedule. This permits analysis results to upload for Dependabot PRs while avoiding push-triggered analysis runs with Dependabot's read-only token. Scorecard runs weekly, when branch-protection settings change, or when manually dispatched by a maintainer.
+CodeQL runs on pull requests, pushes to `main`/`master`, manual dispatch, and a weekly schedule. Dependabot-authored push runs are skipped because their token is read-only; their pull-request analysis still runs and uploads results. Scorecard runs weekly, when branch-protection settings change, or when manually dispatched by a maintainer.
 
 Automatic approval is not enabled. Auto-merge is currently off; consider it only after a second maintainer can provide independent review and every required check passes.
 
