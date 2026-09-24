@@ -1,7 +1,7 @@
 ---
 type: check
 date: 2026-09-24
-status: current
+status: superseded
 valid_from: 2026-09-24
 tags: [release, security, github, packaging, compatibility]
 ---
@@ -9,6 +9,8 @@ tags: [release, security, github, packaging, compatibility]
 # Production Release Audit
 
 This is a point-in-time audit, not a certification or guarantee that ForgeLoop is defect-free.
+
+This pre-release snapshot was superseded by the completed `v0.1.0` release. The follow-up outcome is recorded below; ongoing gaps remain in `docs/ROADMAP.md`.
 
 ## Decision
 
@@ -50,3 +52,10 @@ Checked against `sentientsky/ForgeLoop` on 2026-09-24:
 - Record clean-session acceptance evidence for Claude Code and Codex, then the remaining named tools.
 - Add hosted Windows and macOS CI, and build a conflict-aware installer for existing repositories.
 - Continue working through Scorecard maturity notices without manufacturing review history or claiming certifications.
+
+## Follow-Up Outcome
+
+- PR #24 merged as `af36abe42e7bcc5020674aa0c168e41a7ff5a294`; post-merge CI, CodeQL, and fuzz checks passed.
+- `v0.1.0` published as a public GitHub source release. The ZIP passed the credential-path screen; its SHA-256 and GitHub provenance were independently verified against the expected repository, release workflow, tag, and commit.
+- GitHub template mode and discovery topics are enabled. Active ruleset `Protect version tags` blocks updates and deletions of `v*` tags.
+- The seven remaining Dependabot version-update PRs were superseded by the combined, checked update in PR #24. At follow-up, open Dependabot security alerts and secret-scanning alerts remained at zero; three open code-scanning alerts remained Scorecard maturity signals.

@@ -8,6 +8,10 @@ ForgeLoop follows practical semantic versioning:
 - minor versions for new compatible commands, skills, templates, or integrations
 - major versions for breaking workflow, CLI, or package changes
 
+## Unreleased
+
+- documented immutable GitHub version-tag protection in the maintainer and release guides
+
 ## 0.1.0 - 2026-09-24
 
 - clarified GitHub-template alpha distribution and removed PyPI publishing to prevent a package-name/import collision
