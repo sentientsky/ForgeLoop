@@ -301,6 +301,29 @@ class ValidationTests(unittest.TestCase):
             {finding.code for finding in findings},
         )
 
+    def test_validation_requires_codeql_write_permissions_at_job_scope(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workflow = Path(tmp) / ".github/workflows/codeql.yml"
+            workflow.parent.mkdir(parents=True)
+            workflow.write_text(
+                "name: CodeQL\n"
+                "permissions:\n"
+                "  contents: read\n"
+                "  security-events: write\n"
+                "jobs:\n"
+                "  analyse:\n"
+                "    runs-on: ubuntu-latest\n"
+                "    steps: []\n",
+                encoding="utf-8",
+            )
+
+            findings = validate_repo(Path(tmp))
+
+        self.assertIn(
+            "codeql-global-write-permissions",
+            {finding.code for finding in findings},
+        )
+
 
 class NewNoteTests(unittest.TestCase):
     def test_slugify_removes_path_traversal_characters(self) -> None:

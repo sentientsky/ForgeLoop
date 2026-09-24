@@ -499,6 +499,8 @@ def _validate_github_workflows(root: Path) -> list[Finding]:
             )
         if path.name == "scorecard.yml":
             findings.extend(_validate_scorecard_permissions(path, text))
+        elif path.name == "codeql.yml":
+            findings.extend(_validate_codeql_permissions(path, text))
 
         for line_number, line in enumerate(text.splitlines(), start=1):
             match = re.search(r"\buses:\s*([^\s#]+)", line)
@@ -569,6 +571,30 @@ def _validate_scorecard_permissions(path: Path, text: str) -> list[Finding]:
             )
         )
     return errors
+
+
+def _validate_codeql_permissions(path: Path, text: str) -> list[Finding]:
+    """Keep CodeQL publishing permissions scoped to its analysis job."""
+    global_match = re.search(
+        r"^permissions:\s*\n((?:^  [^\n]*\n|^\s*\n)*)",
+        text,
+        re.MULTILINE,
+    )
+    global_permissions = global_match.group(1).splitlines() if global_match else []
+    if any(
+        re.search(r":\s*write\s*$", line.strip())
+        for line in global_permissions
+        if line.strip() and not line.lstrip().startswith("#")
+    ):
+        return [
+            Finding(
+                "error",
+                "codeql-global-write-permissions",
+                "CodeQL security-event publishing permission must be scoped to its analysis job.",
+                path,
+            )
+        ]
+    return []
 
 
 def _validate_versions(root: Path) -> list[Finding]:
