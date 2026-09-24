@@ -19,6 +19,21 @@ Thumbs.db
 *.env
 secrets.env
 secret.env
+.pypirc
+.npmrc
+.netrc
+.git-credentials
+.aws/credentials
+.config/gcloud/application_default_credentials.json
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+id_ed25519_sk
+id_ecdsa_sk
+*.pem
+*.p12
+*.pfx
 
 # Claude local-only files
 .claude/settings.local.json

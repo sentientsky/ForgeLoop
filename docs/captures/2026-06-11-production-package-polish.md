@@ -30,5 +30,4 @@ Production polish needs:
 
 Treat release assets as part of the product, not repository decoration.
 
-ForgeLoop now checks production release assets through `python -m forgeloop doctor .`.
-
+ForgeLoop checks local release-readiness files through `python -m forgeloop doctor .`; this does not inspect GitHub releases or certify production readiness.

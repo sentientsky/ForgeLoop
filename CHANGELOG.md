@@ -8,9 +8,15 @@ ForgeLoop follows practical semantic versioning:
 - minor versions for new compatible commands, skills, templates, or integrations
 - major versions for breaking workflow, CLI, or package changes
 
-## Unreleased
+## 0.1.0 - 2026-09-24
 
+- clarified GitHub-template alpha distribution and removed PyPI publishing to prevent a package-name/import collision
+- changed compatibility reporting to state that it checks profile-file presence, not live external-tool behaviour
+- added full-source GitHub release archives with secret-path screening and build provenance
+- added downloadable SHA-256 checksums and fail-closed verification for release retries
+- replaced outdated first-push and PyPI setup instructions with current repository operations
 - added Python 3.13 and 3.14 CI coverage
+- raised developer-tool minimums to match tested hash-locked CI versions and aligned CodeQL, Scorecard, and provenance actions with reviewed upstream updates
 - added Ruff linting and a measured branch-coverage floor
 - added an isolated installed-wheel smoke test to CI and releases
 - pinned every external GitHub Action to a full commit SHA

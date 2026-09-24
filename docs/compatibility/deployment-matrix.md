@@ -1,30 +1,30 @@
 ---
 type: compatibility
-date: 2026-05-11
+date: 2026-09-24
 status: current
 tags: [deployment, compatibility, ai-tools]
 ---
 
 # Deployment Matrix
 
-This matrix records the current ForgeLoop support claim for each tool family.
+This matrix records the profile files provided by ForgeLoop and the evidence level. A local file-presence check is not a live integration test.
 
 For repeatable clean-session prompts, see `docs/compatibility/deployment-evals/2026-05-18-clean-session-acceptance.md`.
 
-| Tool | Level | Entry Point | Last Verified | Limitation |
+| Tool | Profile level | Entry point | Evidence | Limitation |
 | --- | --- | --- | --- | --- |
-| Claude Code | Full | `CLAUDE.md`, `.claude/skills/` | 2026-05-11 | Real user sessions still need periodic skill trigger evals. |
-| Codex | Full | `AGENTS.md` | 2026-05-11 | Uses portable instructions rather than Claude skills. |
-| Cursor | Supported | `.cursor/rules/forgeloop.mdc` | 2026-05-11 | Model routing can change token counts. |
-| GitHub Copilot | Supported | `.github/copilot-instructions.md` | 2026-05-11 | Workspace behaviour depends on Copilot client support. |
-| Gemini | Supported | `GEMINI.md` | 2026-05-11 | Exact token counts require provider tooling. |
-| Windsurf | Supported | `.windsurf/rules/forgeloop.md` | 2026-05-11 | Keep rule file concise. |
-| Cline / Roo Code | Supported | `.clinerules/`, `.roo/rules/` | 2026-05-11 | Requires local extension configuration. |
-| JetBrains AI | Beta | `.aiassistant/rules/forgeloop.md` | 2026-05-11 | Native rule behaviour needs more user testing. |
-| Kiro | Beta | `.kiro/steering/` | 2026-05-11 | Steering support may vary by version. |
-| OpenCode | Supported | `.opencode/agents/forge-review.md` | 2026-05-11 | Agent schema may evolve. |
-| Aider | Portable | `.aider.conf.yml` | 2026-05-11 | Uses shared instructions rather than native stages. |
-| OpenCLI | Supported integration | `integrations/opencli/` | 2026-05-11 | Optional peer dependency, not required for core ForgeLoop. |
+| Claude Code | Primary profile | `CLAUDE.md`, `.claude/skills/` | Files and metadata validated by CI; live check must be recorded per release | Real skill triggering and tool behaviour are not established by `compat`. |
+| Codex | Primary profile | `AGENTS.md` | Files present; live check must be recorded per release | Uses portable instructions rather than Claude skills. |
+| Cursor | Profile provided | `.cursor/rules/forgeloop.mdc` | File presence only | Confirm rule activation and behaviour in the current client. |
+| GitHub Copilot | Profile provided | `.github/copilot-instructions.md` | File presence only | Workspace behaviour depends on Copilot client support. |
+| Gemini | Profile provided | `GEMINI.md` | File presence only | Exact token counts require provider tooling. |
+| Windsurf | Profile provided | `.windsurf/rules/forgeloop.md` | File presence only | Confirm rule activation in the current client. |
+| Cline / Roo Code | Profile provided | `.clinerules/`, `.roo/rules/` | File presence only | Requires local extension configuration. |
+| JetBrains AI | Beta profile | `.aiassistant/rules/forgeloop.md` | File presence only | Native rule behaviour needs IDE testing. |
+| Kiro | Beta profile | `.kiro/steering/` | File presence only | Steering support may vary by version. |
+| OpenCode | Profile provided | `.opencode/agents/forge-review.md` | File presence only | Agent schema may evolve. |
+| Aider | Portable profile | `.aider.conf.yml` | File presence only | Uses shared instructions rather than native stages. |
+| OpenCLI | Optional peer plugin | `integrations/opencli/` | Source files validated; live bridge is optional and not required for core ForgeLoop | Browser sessions are privileged and must be tested explicitly. |
 
 Run this before a public release:
 
@@ -34,4 +34,4 @@ python -m forgeloop compat .
 python -m forgeloop validate .
 ```
 
-Public compatibility claims should say whether the evidence is file-readiness, local CLI validation, or a live clean-session transcript.
+The `compat` command reports only required-file presence. Public claims must say whether evidence is file presence, repository validation, or a dated live clean-session transcript.

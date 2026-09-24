@@ -4,11 +4,12 @@ import json
 import os
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from datetime import date
 from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
+from zipfile import ZipFile
 
 from forgeloop.banner import ASCII_BANNER, ORANGE, RESET, is_ascii, render_intro
 from forgeloop.cli import main
@@ -37,6 +38,8 @@ from forgeloop.opencli import (
     parse_node_major,
     run_opencli_install,
 )
+from forgeloop.release_archive import forbidden_source_paths
+from forgeloop.release_archive import main as check_release_archive
 from forgeloop.secrets import (
     check_secrets,
     external_secrets_path,
@@ -542,20 +545,36 @@ class ContextPackTests(unittest.TestCase):
 
 
 class CompatibilityTests(unittest.TestCase):
+    def test_missing_repository_profiles_are_not_reported_as_present(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            report = compatibility_report(Path(temp_dir))
+
+        self.assertEqual(2, report["schema_version"])
+        self.assertFalse(report["targets"][0]["profile_files_present"])
+
     def test_current_repository_reports_core_tool_compatibility(self) -> None:
         root = Path(__file__).resolve().parents[1]
         report = compatibility_report(root)
         targets = {target["tool"]: target for target in report["targets"]}
 
-        self.assertTrue(targets["Claude Code"]["ready"])
-        self.assertTrue(targets["Codex"]["ready"])
-        self.assertTrue(targets["Cursor"]["ready"])
-        self.assertTrue(targets["GitHub Copilot"]["ready"])
-        self.assertTrue(targets["Gemini CLI / Gemini Code Assist"]["ready"])
-        self.assertTrue(targets["Windsurf"]["ready"])
-        self.assertTrue(targets["Cline / Roo Code"]["ready"])
-        self.assertTrue(targets["OpenCode"]["ready"])
-        self.assertTrue(targets["OpenCLI integrated plugin"]["ready"])
+        self.assertTrue(targets["Claude Code"]["profile_files_present"])
+        self.assertTrue(targets["Codex"]["profile_files_present"])
+        self.assertTrue(targets["Cursor"]["profile_files_present"])
+        self.assertTrue(targets["GitHub Copilot"]["profile_files_present"])
+        self.assertTrue(targets["Gemini CLI / Gemini Code Assist"]["profile_files_present"])
+        self.assertTrue(targets["Windsurf"]["profile_files_present"])
+        self.assertTrue(targets["Cline / Roo Code"]["profile_files_present"])
+        self.assertTrue(targets["OpenCode"]["profile_files_present"])
+        self.assertTrue(targets["OpenCLI integrated plugin"]["profile_files_present"])
+
+    def test_release_workflow_limits_tags_to_protected_main_history(self) -> None:
+        workflow = Path(__file__).resolve().parents[1] / ".github/workflows/release.yml"
+        text = workflow.read_text(encoding="utf-8")
+
+        self.assertIn("fetch-depth: 0", text)
+        self.assertIn('git merge-base --is-ancestor "$GITHUB_SHA" origin/main', text)
+        self.assertIn("dist/*-source.zip.sha256", text)
+        self.assertIn("sha256sum", text)
 
     def test_compat_cli_outputs_report(self) -> None:
         root = Path(__file__).resolve().parents[1]
@@ -566,6 +585,70 @@ class CompatibilityTests(unittest.TestCase):
 
         self.assertIn("Claude Code", output.getvalue())
         self.assertIn("Codex", output.getvalue())
+        self.assertIn("does not verify behaviour inside the external tool", output.getvalue())
+
+
+class ReleaseArchiveTests(unittest.TestCase):
+    def test_source_archive_check_allows_example_env_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            archive_path = Path(temp_dir) / "source.zip"
+            with ZipFile(archive_path, "w") as archive:
+                archive.writestr("ForgeLoop/.env.example", "EXAMPLE=value\n")
+                archive.writestr("ForgeLoop/README.md", "safe\n")
+
+            self.assertEqual([], forbidden_source_paths(archive_path))
+
+    def test_source_archive_check_rejects_local_secret_files_case_insensitively(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            archive_path = Path(temp_dir) / "source.zip"
+            with ZipFile(archive_path, "w") as archive:
+                archive.writestr("ForgeLoop/.ENV.production", "secret")
+                archive.writestr("ForgeLoop/production.env", "secret")
+                archive.writestr("ForgeLoop/.forgeloop.local.json", "{}")
+                archive.writestr("ForgeLoop/.claude/settings.local.json", "{}")
+                archive.writestr("ForgeLoop/.npmrc", "//registry.npmjs.org/:_authToken=secret")
+                archive.writestr("ForgeLoop/.aws/credentials", "secret")
+                archive.writestr("ForgeLoop/.ssh/id_ecdsa", "private key")
+                archive.writestr("ForgeLoop/keys/deploy.PEM", "private key")
+
+            self.assertEqual(
+                [
+                    "ForgeLoop/.ENV.production",
+                    "ForgeLoop/production.env",
+                    "ForgeLoop/.forgeloop.local.json",
+                    "ForgeLoop/.claude/settings.local.json",
+                    "ForgeLoop/.npmrc",
+                    "ForgeLoop/.aws/credentials",
+                    "ForgeLoop/.ssh/id_ecdsa",
+                    "ForgeLoop/keys/deploy.PEM",
+                ],
+                forbidden_source_paths(archive_path),
+            )
+
+    def test_source_archive_cli_returns_nonzero_for_local_secret_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            archive_path = Path(temp_dir) / "source.zip"
+            with ZipFile(archive_path, "w") as archive:
+                archive.writestr("ForgeLoop/secrets.env", "secret")
+            output = StringIO()
+            with redirect_stdout(output):
+                result = check_release_archive([str(archive_path)])
+
+        self.assertEqual(1, result)
+        self.assertIn("1 local-only file", output.getvalue())
+        self.assertNotIn("secrets.env", output.getvalue())
+
+    def test_source_archive_cli_rejects_invalid_zip(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            archive_path = Path(temp_dir) / "invalid.zip"
+            archive_path.write_text("not a zip", encoding="utf-8")
+            errors = StringIO()
+
+            with redirect_stderr(errors), self.assertRaises(SystemExit) as error:
+                check_release_archive([str(archive_path)])
+
+        self.assertEqual(2, error.exception.code)
+        self.assertIn("Could not read the source ZIP archive", errors.getvalue())
 
 
 class DoctorTests(unittest.TestCase):
@@ -576,7 +659,8 @@ class DoctorTests(unittest.TestCase):
 
         self.assertEqual([], errors)
         self.assertTrue(any(check["name"] == "opencli" for check in report["checks"]))
-        self.assertTrue(any(check["name"] == "release-assets" for check in report["checks"]))
+        release_check = next(check for check in report["checks"] if check["name"] == "release-readiness-files")
+        self.assertIn("published GitHub releases are not checked", release_check["message"])
 
     def test_doctor_cli_outputs_health_report(self) -> None:
         root = Path(__file__).resolve().parents[1]
@@ -722,7 +806,10 @@ class SetupMenuTests(unittest.TestCase):
         menu = setup_menu_text()
 
         self.assertIn("Claude Code", menu)
+        self.assertIn("Claude Code [primary]", menu)
         self.assertIn("Codex", menu)
+        self.assertIn("Codex [primary]", menu)
+        self.assertIn("does not install or merge files", menu)
         self.assertIn("Cursor", menu)
         self.assertIn("GitHub Copilot", menu)
         self.assertIn("Windsurf", menu)
@@ -738,6 +825,7 @@ class SetupMenuTests(unittest.TestCase):
             self.assertEqual(0, main(["setup", str(root), "--tool", "codex", "--dry-run"]))
 
         self.assertIn("Selected: Codex", output.getvalue())
+        self.assertIn("does not install or merge profile files", output.getvalue())
         self.assertFalse((root / ".forgeloop.local.json").exists())
 
     def test_setup_interactive_selection_can_choose_all_supported(self) -> None:

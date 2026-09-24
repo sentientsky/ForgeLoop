@@ -1,73 +1,29 @@
 # Roadmap And Current Status
 
-This page separates what is already built from what still needs repository-owner setup or future product work.
-
 ## Current Status
 
-ForgeLoop is locally release-ready for a first public GitHub push.
+ForgeLoop is a public GitHub source alpha. The repository is intended to be used as a starter template for a new project. Its local CLI selects a tool profile and checks repository files; it does not merge ForgeLoop into an existing project or prove that an external AI tool loaded the profile.
 
-The repository now includes the five-stage workflow, Claude Code skills, portable Codex guidance, multi-tool compatibility profiles, memory palace structure, Forge Context Packets, measured token reporting, external secrets handling, optional OpenCLI integration, release workflows, CodeQL, Scorecard, repository governance, governed-memory metadata checks, a local tamper-evident audit log, issue templates, and an installed-wheel smoke test.
+The current source includes the five-stage workflow, Claude Code skills, portable tool instruction profiles, memory palace structure, Forge Context Packets, measured token reporting, external secrets handling, optional OpenCLI integration, release checks, CodeQL, fuzzing, GitHub governance, and governed-memory metadata checks.
 
-Current local proof commands:
+Automated evidence:
 
-```bash
-python -m ruff check forgeloop tests
-python -m coverage run -m unittest discover -s tests
-python -m coverage report
-python -m forgeloop validate .
-python -m forgeloop doctor .
-python -m forgeloop compat .
-python -m forgeloop index . --check
-python -m forgeloop secrets check .
-python -m forgeloop governance audit .
-python -m forgeloop governance verify .
-python -m build
-python -m twine check dist/*
-python tests/package_smoke.py dist .
-```
+- CI tests Python 3.10 through 3.14, lint, validation, and the CLI wheel in isolation.
+- CodeQL and a bounded seeded fuzz workflow run on GitHub Actions.
+- The local compatibility check confirms only that required profile files exist.
+- Clean-session behaviour inside each external tool still needs current, recorded acceptance evidence.
+- The Python wheel is an internal smoke-test artifact only; no PyPI distribution is published.
 
-## Owner-Only Launch Tasks
+## Production Work Still Needed
 
-These cannot be completed safely without the final GitHub owner or organisation:
+- Build a conflict-aware installer for adopting ForgeLoop in existing repositories, including preview, backup, update, and rollback behaviour.
+- Record clean-session acceptance results for Claude Code and Codex first, then each other tool before making stronger compatibility claims.
+- Expand Windows and macOS CI coverage; current hosted CI runs on Ubuntu, although maintainers may test locally on other systems.
+- Grow tests for CLI branches and optional OpenCLI integration beyond the current coverage floor.
+- Add a second maintainer and require one independent review for protected-branch changes when available.
+- Revisit Python distribution only after resolving the PyPI name and import-namespace collision and packaging the full product.
+- Reassess governed-memory claims with external-store deletion evidence before making legal or certification claims.
 
-- create the public GitHub repository
-- push the `main` branch
-- enable branch protection, security features, and required checks
-- configure PyPI Trusted Publishing
-- create the first signed or reviewed release tag
+## Contributions
 
-Follow `docs/GITHUB_SETUP.md` for these steps.
-
-## Near-Term Product Work
-
-These are the next improvements after public launch:
-
-- record live clean-session transcripts for each supported AI coding tool
-- add exact token counters where a provider exposes a safe local or official counter
-- expand skill evaluation examples into a runnable behaviour test harness
-- add a dynamic review router that chooses reviewers from changed files and risk signals
-- add a worktree lifecycle command in dry-run mode before any automated writes
-- package optional integrations only after install and uninstall behaviour is tested
-- publish a small docs site once repository URLs are final
-- define and test provider adapters for external stores that can return scoped erasure evidence across embeddings, graphs, caches, and backups
-
-## Contribution Direction
-
-Good first contributions should be small, testable, and tied to a real user workflow.
-
-Prefer:
-
-- one problem per pull request
-- clear reproduction steps
-- measured token or compatibility evidence for public claims
-- docs updates with examples
-- tests for CLI, validation, security, or packaging changes
-
-Avoid:
-
-- broad speculative rewrites
-- unmeasured performance or token-saving claims
-- silent installation of external tools
-- long-lived secrets in GitHub settings or repository files
-
-ForgeLoop should keep getting stronger by proving more of its behaviour, not by making louder claims.
+Good first contributions are small, testable, and tied to a real workflow. Read `CONTRIBUTING.md`, `GOVERNANCE.md`, and `docs/compatibility/deployment-matrix.md` before proposing support claims.

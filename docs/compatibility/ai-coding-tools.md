@@ -14,6 +14,8 @@ The compatibility rule is:
 one workflow, tool-native entry points
 ```
 
+The compatibility report verifies expected files only. It does not launch these tools or verify that they load or follow the files. Treat a tool as live-verified only after recording a dated clean-session acceptance result in `docs/compatibility/deployment-evals/`.
+
 ## Supported Entry Points
 
 | Tool | Entry point | Status | Notes |

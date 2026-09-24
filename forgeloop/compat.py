@@ -195,13 +195,13 @@ def compatibility_report(root: Path) -> dict[str, Any]:
             {
                 "tool": target["tool"],
                 "priority": target["priority"],
-                "ready": all(item["exists"] for item in required),
+                "profile_files_present": all(item["exists"] for item in required),
                 "required": required,
                 "optional": optional,
             }
         )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "root": str(root),
         "targets": targets,
     }
@@ -210,11 +210,12 @@ def compatibility_report(root: Path) -> dict[str, Any]:
 def format_compatibility_report(report: dict[str, Any]) -> str:
     lines = ["ForgeLoop compatibility report:"]
     for target in report["targets"]:
-        ready = "ready" if target["ready"] else "missing files"
-        lines.append(f"- {target['tool']} ({target['priority']}): {ready}")
+        status = "profile files present" if target["profile_files_present"] else "missing files"
+        lines.append(f"- {target['tool']} ({target['priority']}): {status}")
         missing = [item["path"] for item in target["required"] if not item["exists"]]
         if missing:
             lines.append(f"  missing: {', '.join(missing)}")
+    lines.append("This checks files only; it does not verify behaviour inside the external tool.")
     return "\n".join(lines)
 
 

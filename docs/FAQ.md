@@ -26,7 +26,19 @@ No. ForgeLoop integrates OpenCLI as an optional peer plugin. OpenCLI installs on
 
 ## Can beginners use it?
 
-Yes. Start with `docs/GETTING_STARTED.md` and the five-stage loop.
+Yes, for a new project created from the GitHub template. Start with `docs/INSTALLATION.md` and `docs/GETTING_STARTED.md`. ForgeLoop does not yet have a conflict-aware installer for existing repositories.
+
+## Can I install it into an existing project?
+
+Not automatically. The setup menu records a local tool choice but does not copy or merge ForgeLoop files. Follow `docs/INSTALLATION.md`; adapt files deliberately and resolve conflicts yourself.
+
+## Can I run `pip install forgeloop`?
+
+No. That PyPI name belongs to an unrelated project. ForgeLoop is distributed from GitHub as a source template; no PyPI package is published.
+
+## Does `forgeloop compat` prove my AI tool works with ForgeLoop?
+
+No. It confirms that expected profile files are present. A live clean-session check must be run in the actual external tool and recorded before claiming verified compatibility.
 
 ## Can teams use it?
 
@@ -40,9 +52,9 @@ Contributors open a pull request. Automation tests the change, then a maintainer
 
 No. They use the same tests, security checks, human review, and approval rules as any other contribution.
 
-## Where are the GitHub launch instructions?
+## Where are the GitHub setup instructions?
 
-Use `GITHUB_SETUP.md` for repository creation, branch protection, security settings, PyPI Trusted Publishing, and the first public release.
+Use `GITHUB_SETUP.md` for the current repository controls and source-release process. The repository is already public; PyPI publishing is intentionally disabled.
 
 ## Are hooks active by default?
 
@@ -59,8 +71,8 @@ python -m forgeloop index . --check
 python -m forgeloop secrets check .
 ```
 
-## How do maintainers publish a package?
+## How do maintainers publish a source release?
 
 Read `docs/PUBLISHING.md`.
 
-ForgeLoop should use PyPI Trusted Publishing, not long-lived package tokens.
+ForgeLoop source releases are created on GitHub after a matching version tag passes the release workflow.

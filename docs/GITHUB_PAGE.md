@@ -1,5 +1,7 @@
 # ForgeLoop
 
+**Release status:** public GitHub source alpha. ForgeLoop is provided as a repository template; it is not a PyPI package and does not yet have an automated installer for existing repositories.
+
 ForgeLoop is an open source operating system for AI-assisted engineering.
 
 It helps Claude Code users move fast without losing clarity, discipline, memory, review quality, or long-term learning.

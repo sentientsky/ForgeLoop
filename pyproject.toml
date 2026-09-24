@@ -43,13 +43,13 @@ forgeloop = "forgeloop.cli:main"
 
 [project.optional-dependencies]
 dev = [
-    "build>=1.2.0",
-    "coverage[toml]>=7.14.0",
-    "ruff>=0.15.0",
+    "build>=1.6.1",
+    "coverage[toml]>=7.16.1",
+    "ruff>=0.16.8",
     "twine>=7.0.0",
 ]
 tokenizers = [
-    "tiktoken>=0.12.0",
+    "tiktoken>=0.14.0",
 ]
 
 [build-system]

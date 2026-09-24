@@ -38,6 +38,7 @@ REQUIRED_FILES = [
     "SUPPORT.md",
     ".env.example",
     "pyproject.toml",
+    "forgeloop/release_archive.py",
     "docs/WHAT_IT_IS.md",
     "docs/GETTING_STARTED.md",
     "docs/HOW_TO_USE.md",
