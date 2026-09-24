@@ -20,7 +20,7 @@ The scheduled Scorecard job was rejected by the Scorecard publishing service bec
 
 The workflow now keeps global `contents: read` and grants the three needed permissions only to the analysis job. ForgeLoop validation has a regression check for this scope boundary.
 
-The next run showed that the action was pinned to the annotated tag object rather than the commit behind it. GitHub's API and the upstream Git ref both confirm `4eaacf0543bb3f2c246792bd56e8cdeffafb205a` as the peeled commit for `v2.4.3`; the workflow now pins that commit.
+The next run showed that the action was pinned to the annotated tag object rather than the commit behind it. GitHub's API and the upstream Git ref confirm `4eaacf0543bb3f2c246792bd56e8cdeffafb205a` as the peeled commit for `v2.4.3`; the workflow now pins that commit. Scorecard then identified the same tag-object issue for `github/codeql-action/upload-sarif`. The `v4.36.2` tag resolves to `8aad20d150bbac5944a9f9d289da16a4b0d87c1e`, which is now used consistently in the CodeQL and Scorecard workflows.
 
 ## CI Lint Update
 
