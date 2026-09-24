@@ -162,7 +162,7 @@ Production and support docs:
 
 Project stewardship is defined in `GOVERNANCE.md`. A pull request is required and checks never auto-approve it. While there is one active maintainer, branch protection cannot require an independent approval; the solo-maintainer exception and remaining risk are documented in `GOVERNANCE.md`.
 
-ForgeLoop is distributed as a GitHub source template. The setup menu records your preferred tool; it does not copy files into a separate existing repository. See `docs/INSTALLATION.md` before adopting it in an existing project.
+ForgeLoop is distributed as a GitHub source template. Use `adopt` from a ForgeLoop checkout to preview and add selected tool entry files into an existing repository. It preserves conflicts and does not install the full CLI/runtime there. See `docs/INSTALLATION.md` before adopting it.
 
 1. Create a new repository from the [ForgeLoop template](https://github.com/sentientsky/ForgeLoop/generate).
 2. Copy the clone URL shown on your new repository's GitHub page, clone it, and open its root folder in your AI coding tool.
@@ -259,6 +259,8 @@ Run these from the repository root:
 python -m forgeloop validate .
 python -m forgeloop setup . --list
 python -m forgeloop setup . --tool claude-code --dry-run
+python -m forgeloop adopt ../my-project --tool claude-code
+python -m forgeloop adopt ../my-project --tool claude-code --apply
 python -m forgeloop compat .
 python -m forgeloop doctor .
 python -m forgeloop tokens "memory validation" . --limit 5
@@ -299,9 +301,9 @@ Use `doctor` for a fuller local health and release-readiness check. It combines 
 
 ## GitHub Security Checks
 
-The public repository runs CI on Python 3.10 through 3.14, CodeQL analysis, and a bounded seeded fuzz session for the frontmatter parser. GitHub workflow actions are pinned to commit hashes, and CI/build tools are installed from hash-locked requirements. Dependabot security alerts and updates, secret scanning with push protection, and private vulnerability reporting are enabled. `main` requires a pull request and passing CI, CodeQL, and fuzz checks. These controls reduce risk; they do not prove the absence of defects.
+The public repository tests Python 3.10 through 3.14 on Ubuntu, Windows, and macOS. The required `cross-platform` gate aggregates the Windows/macOS matrix; package-quality checks run on Ubuntu, with CodeQL analysis and a bounded seeded fuzz session for the frontmatter parser. GitHub workflow actions are pinned to commit hashes, and CI/build tools are installed from hash-locked requirements. Dependabot security alerts and updates, secret scanning with push protection, and private vulnerability reporting are enabled. `main` requires a pull request and passing CI, cross-platform, CodeQL, and fuzz checks. These controls reduce risk; they do not prove the absence of defects.
 
-Use `setup` to choose a local AI coding tool profile. It writes `.forgeloop.local.json`, which is ignored by Git. Use `--dry-run` to preview without writing.
+Use `setup` to choose a local AI coding tool profile. It writes `.forgeloop.local.json`, which is ignored by Git. Use `adopt PATH --tool TOOL` from the ForgeLoop checkout to preview adding allowlisted profile files to another project. `adopt` never overwrites differing files; it does not install the full ForgeLoop CLI/runtime into the destination.
 
 Use `opencli plan` to preview the optional OpenCLI integration. OpenCLI is integrated as an external peer plugin, not copied into ForgeLoop. Install only when you explicitly choose:
 

@@ -33,7 +33,7 @@ uv pip compile --generate-hashes --universal --python-version 3.10 --output-file
 uv pip compile --generate-hashes --python-version 3.14 --python-platform x86_64-unknown-linux-gnu --output-file .github/requirements-fuzz.txt .github/requirements-fuzz.in
 ```
 
-Review the complete diff, including versions, markers, and hashes. Do not remove `--require-hashes` from workflow install commands. CI itself checks Python 3.10 through 3.14.
+Review the complete diff, including versions, markers, and hashes. Do not remove `--require-hashes` from workflow install commands. Hosted tests run Python 3.10 through 3.14 on Ubuntu, Windows, and macOS.
 
 The `Fuzz` workflow runs a bounded, seeded Atheris session against the frontmatter parser. Reproduce it locally on Linux or macOS after installing the exact fuzzer lock:
 

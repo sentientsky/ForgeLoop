@@ -1,6 +1,6 @@
 # ForgeLoop
 
-**Release status:** public GitHub source alpha. ForgeLoop is provided as a repository template; it is not a PyPI package and does not yet have an automated installer for existing repositories.
+**Release status:** public GitHub source alpha. ForgeLoop is provided as a repository template and has a preview-first additive profile installer for existing repositories. It is not a PyPI package, and the adopter does not install the full CLI/runtime or manage updates.
 
 ForgeLoop is an open source operating system for AI-assisted engineering.
 

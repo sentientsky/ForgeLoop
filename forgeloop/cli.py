@@ -6,6 +6,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from .adoption import adopt_into_repo, adoption_source_root, format_adoption_report
 from .banner import render_intro
 from .compat import compatibility_report, format_compatibility_report
 from .context import build_context_pack, render_context_pack
@@ -104,6 +105,12 @@ def main(argv: list[str] | None = None) -> int:
     setup_parser.add_argument("--list", action="store_true", help="show the setup menu and exit")
     setup_parser.add_argument("--dry-run", action="store_true", help="show result without writing local setup")
     setup_parser.add_argument("--json", action="store_true", help="print machine-readable output")
+
+    adopt_parser = subparsers.add_parser("adopt", help="preview or add ForgeLoop files to an existing repository")
+    adopt_parser.add_argument("root", help="existing project directory to adopt ForgeLoop into")
+    adopt_parser.add_argument("--tool", choices=supported_tool_ids(), required=True, help="tool profile to add")
+    adopt_parser.add_argument("--apply", action="store_true", help="add missing files; preview is the default")
+    adopt_parser.add_argument("--json", action="store_true", help="print machine-readable output")
 
     new_parser = subparsers.add_parser("new", help="create a safe ForgeLoop note from a template")
     new_parser.add_argument("kind", help="note kind, such as discover, frame, check, capture, solution")
@@ -280,6 +287,18 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(format_setup_result(result, root))
         return 1 if result.missing_files else 0
+
+    if args.command == "adopt":
+        try:
+            result = adopt_into_repo(adoption_source_root(), root, args.tool, apply=args.apply)
+        except (OSError, ValueError) as exc:
+            print(f"Could not adopt ForgeLoop files: {exc}", file=sys.stderr)
+            return 1
+        if args.json:
+            print(json.dumps(result.as_dict(), indent=2))
+        else:
+            print(format_adoption_report(result))
+        return 1 if result.conflicts else 0
 
     if args.command == "new":
         try:

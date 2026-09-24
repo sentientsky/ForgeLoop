@@ -31,9 +31,25 @@ python -m forgeloop setup .
 
 This opens the ForgeLoop source repository as a workspace. Do not commit personal experiments to the upstream repository.
 
-## Use With An Existing Repository
+## Add A Profile To An Existing Repository
 
-There is not yet an automated installer that safely merges ForgeLoop files into an existing project. The setup menu only records a tool selection; it does not install or merge instruction files. Do not assume that running it in an unrelated repository enables ForgeLoop. For now, review the relevant entry files and copy or adapt them deliberately, resolving conflicts with existing instructions yourself. A conflict-aware installer is a planned follow-up.
+From a ForgeLoop source checkout, preview the native entry files for the tool you use:
+
+```bash
+python -m forgeloop adopt ../my-project --tool claude-code
+```
+
+The command is preview-only unless `--apply` is supplied. Review the proposed files and conflicts, then apply:
+
+```bash
+python -m forgeloop adopt ../my-project --tool claude-code --apply
+```
+
+Replace `claude-code` with a supported tool id such as `codex`, or use `all-supported` for a multi-tool team. The adopter copies only the selected profile's allowlisted entry files. Identical files are left alone; differing files are reported and preserved. It rejects path traversal, symlinks, and Windows junction/reparse-point paths, and rolls back files created by the current run if a later write fails. Review the destination diff before committing.
+
+This is a safe additive profile installer, not a content merger or managed updater. It does not replace conflicting instructions, install a ForgeLoop CLI into the destination, create backups of user files, or automatically update/uninstall files later. To use ForgeLoop's full CLI, memory system, and maintained documentation, create a project from the GitHub template. For an existing project, resolve each reported conflict deliberately.
+
+The `setup` command remains a local preference selector; it does not install files.
 
 ## Python Development Environment
 

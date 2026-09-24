@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide is for a new user creating a project from the ForgeLoop GitHub template. ForgeLoop currently supports template-based greenfield projects; it does not automatically merge its files into an existing repository.
+This guide is for a new user creating a project from the ForgeLoop GitHub template. Existing repositories can preview and add allowlisted tool profile files with `forgeloop adopt`; this does not install the full ForgeLoop runtime or merge conflicting instructions.
 
 For the complete template and existing-repository limitations, see `docs/INSTALLATION.md`.
 

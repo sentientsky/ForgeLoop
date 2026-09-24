@@ -10,6 +10,9 @@ ForgeLoop follows practical semantic versioning:
 
 ## Unreleased
 
+- added preview-first, no-overwrite profile adoption for existing repositories, with rollback on failed writes
+- expanded hosted Python test coverage to Ubuntu, Windows, and macOS
+- clarified that Codex compatibility requires `AGENTS.md`, while a project README is optional
 - documented immutable GitHub version-tag protection in the maintainer and release guides
 
 ## 0.1.0 - 2026-09-24

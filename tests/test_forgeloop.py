@@ -8,9 +8,11 @@ from contextlib import redirect_stderr, redirect_stdout
 from datetime import date
 from io import StringIO
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 from zipfile import ZipFile
 
+from forgeloop.adoption import _is_link_like, _validated_relative_path, adopt_into_repo
 from forgeloop.banner import ASCII_BANNER, ORANGE, RESET, is_ascii, render_intro
 from forgeloop.cli import main
 from forgeloop.compat import compatibility_report
@@ -853,6 +855,131 @@ class SetupMenuTests(unittest.TestCase):
 
             self.assertTrue(result.wrote_config)
             self.assertEqual("codex", payload["selected_tool"])
+
+
+class AdoptionTests(unittest.TestCase):
+    def _source_tree(self, root: Path) -> None:
+        files = {
+            "AGENTS.md": "# ForgeLoop agent rules\n",
+            "docs/HOW_TO_USE.md": "# Workflow guide\n",
+        }
+        for relative, content in files.items():
+            path = root / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+
+    def test_adoption_previews_then_adds_missing_files_without_overwriting(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            source = base / "source"
+            destination = base / "destination"
+            source.mkdir()
+            destination.mkdir()
+            self._source_tree(source)
+            (destination / "AGENTS.md").write_text("# User-owned instructions\n", encoding="utf-8")
+
+            preview = adopt_into_repo(source, destination, "codex")
+            self.assertTrue(preview.dry_run)
+            self.assertEqual("conflict", preview.entries[0].action)
+            self.assertFalse((destination / "docs/HOW_TO_USE.md").exists())
+
+            applied = adopt_into_repo(source, destination, "codex", apply=True)
+            self.assertFalse(applied.dry_run)
+            self.assertEqual(["docs/HOW_TO_USE.md"], [entry.path for entry in applied.entries if entry.action == "created"])
+            self.assertEqual("# User-owned instructions\n", (destination / "AGENTS.md").read_text(encoding="utf-8"))
+            self.assertEqual("# Workflow guide\n", (destination / "docs/HOW_TO_USE.md").read_text(encoding="utf-8"))
+
+            repeated = adopt_into_repo(source, destination, "codex", apply=True)
+            self.assertEqual(1, sum(entry.action == "unchanged" for entry in repeated.entries))
+            self.assertEqual(1, len(repeated.conflicts))
+
+    def test_adoption_rejects_symlinked_destination_components(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            source = base / "source"
+            destination = base / "destination"
+            outside = base / "outside"
+            source.mkdir()
+            destination.mkdir()
+            outside.mkdir()
+            self._source_tree(source)
+            try:
+                (destination / "docs").symlink_to(outside, target_is_directory=True)
+            except OSError as exc:
+                self.skipTest(f"directory symlinks unavailable: {exc}")
+
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                adopt_into_repo(source, destination, "codex", apply=True)
+            self.assertFalse((destination / "AGENTS.md").exists())
+            self.assertFalse((outside / "HOW_TO_USE.md").exists())
+
+    def test_failed_adoption_rolls_back_files_and_directories_it_created(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            source = base / "source"
+            destination = base / "destination"
+            source.mkdir()
+            destination.mkdir()
+            self._source_tree(source)
+
+            from forgeloop import adoption
+
+            create_file = adoption._create_file_exclusive
+            calls = 0
+
+            def fail_on_last_file(path: Path, content: bytes) -> bool:
+                nonlocal calls
+                calls += 1
+                if calls == 2:
+                    raise OSError("simulated write failure")
+                return create_file(path, content)
+
+            with (
+                patch("forgeloop.adoption._create_file_exclusive", side_effect=fail_on_last_file),
+                self.assertRaisesRegex(OSError, "simulated write failure"),
+            ):
+                adopt_into_repo(source, destination, "codex", apply=True)
+
+            self.assertFalse((destination / "AGENTS.md").exists())
+            self.assertFalse((destination / "docs/HOW_TO_USE.md").exists())
+            self.assertFalse((destination / "docs").exists())
+
+    def test_adoption_cli_defaults_to_preview(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            destination = Path(tmp)
+            output = StringIO()
+
+            with (
+                patch("forgeloop.cli.adoption_source_root", return_value=Path(__file__).resolve().parents[1]),
+                redirect_stdout(output),
+            ):
+                self.assertEqual(0, main(["adopt", str(destination), "--tool", "codex"]))
+
+            self.assertIn("Preview only", output.getvalue())
+            self.assertFalse((destination / "AGENTS.md").exists())
+
+    def test_adoption_rejects_traversal_and_cross_platform_absolute_paths(self) -> None:
+        for value in ("../outside.md", "docs/../outside.md", "C:/outside.md", "docs//guide.md", "docs/./guide.md"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                _validated_relative_path(value)
+
+    def test_adoption_refuses_a_destination_inside_the_source_repository(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp)
+            destination = source / "nested"
+            destination.mkdir()
+
+            with self.assertRaisesRegex(ValueError, "inside the ForgeLoop source"):
+                adopt_into_repo(source, destination, "codex")
+
+    def test_adoption_rejects_windows_reparse_points(self) -> None:
+        candidate = SimpleNamespace(
+            is_symlink=lambda: False,
+            is_junction=lambda: False,
+            lstat=lambda: SimpleNamespace(st_file_attributes=0x400),
+        )
+
+        self.assertTrue(_is_link_like(candidate))
 
 
 class TokenReportTests(unittest.TestCase):

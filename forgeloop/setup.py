@@ -20,6 +20,11 @@ SUPPORTED_TOOLS = [
         "usage": "State of Code 2025: 57%; SonarSource 2026: Claude / Claude Code 48%",
         "entry_files": [
             "CLAUDE.md",
+            ".claude/skills/discover/SKILL.md",
+            ".claude/skills/frame/SKILL.md",
+            ".claude/skills/build/SKILL.md",
+            ".claude/skills/check/SKILL.md",
+            ".claude/skills/capture/SKILL.md",
             ".claude/skills/pack-context/SKILL.md",
             ".claude/agents/architecture-reviewer.md",
             ".claude/agents/security-reviewer.md",
@@ -39,7 +44,6 @@ SUPPORTED_TOOLS = [
         "usage": "State of Code 2025: 23%; SonarSource 2026: OpenAI Codex 17%",
         "entry_files": [
             "AGENTS.md",
-            "README.md",
             "docs/HOW_TO_USE.md",
         ],
         "next_steps": [

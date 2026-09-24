@@ -4,7 +4,7 @@ ForgeLoop's public repository is [sentientsky/ForgeLoop](https://github.com/sent
 
 ## Current Repository Controls
 
-- `main` requires a pull request and passing Python 3.10-3.14 CI, package-quality, CodeQL, and fuzz checks.
+- `main` requires a pull request and passing Python 3.10-3.14 tests on Ubuntu, Windows, and macOS, plus package-quality, CodeQL, and fuzz checks. The stable `cross-platform` gate is required so matrix expansion does not stale the branch-protection check name.
 - Branch protection is enforced for administrators; force-push and branch deletion are disabled; review conversations must be resolved.
 - An active `v*` tag ruleset blocks version-tag updates and deletion. Release tags are intentionally immutable.
 - Required independent approvals remain at zero while there is one active maintainer. This is a disclosed solo-maintainer compromise, not equivalent to independent review. Add a second maintainer and raise the requirement to one approval before treating the process as team-reviewed.
@@ -17,7 +17,7 @@ Verify live settings in GitHub before each public release; repository settings c
 
 ForgeLoop's supported alpha distribution is the GitHub template. From the repository page, choose **Use this template** and create a new repository under the intended owner. GitHub creates a separate repository with the tracked files; repository rules, secrets, environments, and other settings must be configured separately. See [GitHub's template repository guide](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-template-repository).
 
-The template is for starting a new project. It does not safely merge ForgeLoop files into an existing codebase. See `docs/INSTALLATION.md` for that limitation and the current manual-adoption boundary.
+The template is the complete distribution for a new project. For existing codebases, `forgeloop adopt` previews and adds only selected profile files; it preserves conflicts and does not install the CLI/runtime or manage future updates. See `docs/INSTALLATION.md` for its limits.
 
 ## Source Release
 
