@@ -262,6 +262,30 @@ class ValidationTests(unittest.TestCase):
 
         self.assertIn("public-url-placeholder", {finding.code for finding in findings})
 
+    def test_validation_requires_scorecard_write_permissions_at_job_scope(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workflow = Path(tmp) / ".github/workflows/scorecard.yml"
+            workflow.parent.mkdir(parents=True)
+            workflow.write_text(
+                "name: Scorecard\n"
+                "permissions:\n"
+                "  contents: read\n"
+                "  security-events: write\n"
+                "  id-token: write\n"
+                "jobs:\n"
+                "  analysis:\n"
+                "    runs-on: ubuntu-latest\n"
+                "    steps: []\n",
+                encoding="utf-8",
+            )
+
+            findings = validate_repo(Path(tmp))
+
+        self.assertIn(
+            "scorecard-global-write-permissions",
+            {finding.code for finding in findings},
+        )
+
 
 class NewNoteTests(unittest.TestCase):
     def test_slugify_removes_path_traversal_characters(self) -> None:

@@ -498,6 +498,8 @@ def _validate_github_workflows(root: Path) -> list[Finding]:
                     path,
                 )
             )
+        if path.name == "scorecard.yml":
+            findings.extend(_validate_scorecard_permissions(path, text))
 
         for line_number, line in enumerate(text.splitlines(), start=1):
             match = re.search(r"\buses:\s*([^\s#]+)", line)
@@ -517,6 +519,57 @@ def _validate_github_workflows(root: Path) -> list[Finding]:
                     )
                 )
     return findings
+
+
+def _validate_scorecard_permissions(path: Path, text: str) -> list[Finding]:
+    """Keep Scorecard's publishing permissions scoped to its own job."""
+    global_match = re.search(
+        r"^permissions:\s*\n((?:^  [^\n]*\n|^\s*\n)*)",
+        text,
+        re.MULTILINE,
+    )
+    analysis_match = re.search(
+        r"^  analysis:\s*\n(.*?)(?=^  [A-Za-z0-9_-]+:\s*$|\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    job_permissions_match = (
+        re.search(
+            r"^    permissions:\s*\n((?:^      [^\n]*\n|^\s*\n)*)",
+            analysis_match.group(1),
+            re.MULTILINE,
+        )
+        if analysis_match
+        else None
+    )
+    global_permissions = global_match.group(1).splitlines() if global_match else []
+    analysis_permissions = job_permissions_match.group(1).splitlines() if job_permissions_match else []
+    global_permissions = [line.strip() for line in global_permissions if line.strip() and not line.lstrip().startswith("#")]
+    analysis_permissions = [
+        line.strip() for line in analysis_permissions if line.strip() and not line.lstrip().startswith("#")
+    ]
+
+    errors: list[Finding] = []
+    if any(re.search(r":\s*write\s*$", entry) or "write-all" in entry for entry in global_permissions):
+        errors.append(
+            Finding(
+                "error",
+                "scorecard-global-write-permissions",
+                "Scorecard publish permissions must be scoped to the analysis job.",
+                path,
+            )
+        )
+    required = {"contents: read", "security-events: write", "id-token: write"}
+    if not required.issubset(set(analysis_permissions)):
+        errors.append(
+            Finding(
+                "error",
+                "scorecard-job-permissions",
+                "Scorecard analysis job must declare only its required read and publishing permissions.",
+                path,
+            )
+        )
+    return errors
 
 
 def _validate_versions(root: Path) -> list[Finding]:
