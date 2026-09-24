@@ -1,11 +1,13 @@
 ---
 type: check
 date: 2026-09-24
-status: current
+status: superseded
 tags: [github, codeql, scorecard, release, security]
 ---
 
 # GitHub Release Follow-Up
+
+This earlier snapshot is superseded by `docs/checks/2026-09-24-production-release-audit.md`.
 
 ## Remote State
 

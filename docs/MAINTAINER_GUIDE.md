@@ -1,8 +1,10 @@
 # Maintainer Guide
 
-This guide is for people preparing ForgeLoop for public use.
+This guide is for maintaining ForgeLoop's public GitHub source-template alpha.
 
 ## Routine Checks
+
+Run these commands from an isolated virtual environment. `docs/INSTALLATION.md` has platform-specific activation instructions.
 
 ```bash
 python -m pip install --require-hashes -r .github/requirements-ci.txt

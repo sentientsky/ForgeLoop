@@ -18,7 +18,7 @@ For first setup, read `docs/GETTING_STARTED.md`.
 
 ## First Setup
 
-Open the repository and run the setup menu:
+Create a new repository from the [ForgeLoop GitHub template](https://github.com/sentientsky/ForgeLoop/generate), clone it, and open its root folder in your AI coding tool. Then run the setup menu:
 
 ```bash
 python -m forgeloop setup .
@@ -42,6 +42,8 @@ The supported options are:
 - All supported tools
 
 The menu also shows coming-soon tools so you can see the roadmap.
+
+The menu records your local tool preference; it does not install or merge ForgeLoop into another repository. See `docs/INSTALLATION.md` before using an existing project.
 
 For a non-interactive preview:
 

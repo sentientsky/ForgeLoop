@@ -82,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     compat_parser.add_argument("root", nargs="?", default=".", help="repository root")
     compat_parser.add_argument("--json", action="store_true", help="print machine-readable output")
 
-    doctor_parser = subparsers.add_parser("doctor", help="run a release-oriented ForgeLoop health check")
+    doctor_parser = subparsers.add_parser("doctor", help="check local ForgeLoop repository health and release readiness")
     doctor_parser.add_argument("root", nargs="?", default=".", help="repository root")
     doctor_parser.add_argument("--json", action="store_true", help="print machine-readable output")
 
@@ -244,7 +244,7 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(report, indent=2))
         else:
             print(format_compatibility_report(report))
-        return 0 if all(target["ready"] for target in report["targets"]) else 1
+        return 0 if all(target["profile_files_present"] for target in report["targets"]) else 1
 
     if args.command == "doctor":
         report = doctor_report(root)

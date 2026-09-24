@@ -73,14 +73,16 @@ python -m forgeloop opencli install . --execute
 
 Browser-backed commands are privileged, so do not run them casually.
 
-## GitHub Actions Release Fails
+## GitHub Source Release Fails
 
 Check:
 
 - the tag starts with `v`
-- PyPI Trusted Publishing is configured for the repository and workflow
+- the pushed tag matches the version in `pyproject.toml`
+- all release-gate checks pass
+- the GitHub token has the workflow's `contents: write` permission
 - package metadata is valid
-- CI passed first
+- no local-only files were committed; inspect the archive safety-check output
 
 Build locally:
 

@@ -160,16 +160,20 @@ Production and support docs:
 - `docs/GITHUB_SETUP.md`
 - `docs/FAQ.md`
 
-Project stewardship is defined in `GOVERNANCE.md`. Pull requests require human review; passing automation never approves a change by itself.
+Project stewardship is defined in `GOVERNANCE.md`. A pull request is required and checks never auto-approve it. While there is one active maintainer, branch protection cannot require an independent approval; the solo-maintainer exception and remaining risk are documented in `GOVERNANCE.md`.
 
-1. Open this folder in Claude Code.
-2. Run the setup menu:
+ForgeLoop is distributed as a GitHub source template. The setup menu records your preferred tool; it does not copy files into a separate existing repository. See `docs/INSTALLATION.md` before adopting it in an existing project.
+
+1. Create a new repository from the [ForgeLoop template](https://github.com/sentientsky/ForgeLoop/generate).
+2. Copy the clone URL shown on your new repository's GitHub page, clone it, and open its root folder in your AI coding tool.
+3. Run the health check and select your tool:
 
 ```bash
+python -m forgeloop doctor .
 python -m forgeloop setup .
 ```
 
-3. Ask your AI coding tool to read its entry file:
+4. Ask your AI coding tool to read its entry file:
 
 - Claude Code: `CLAUDE.md`
 - Codex: `AGENTS.md`
@@ -184,37 +188,39 @@ python -m forgeloop setup .
 - OpenCode: `AGENTS.md` and `.opencode/agents/forge-review.md`
 - Aider: `.aider.conf.yml` and `AGENTS.md`
 
-4. Start with the Discover stage:
+5. Start with the Discover stage:
 
 ```text
 /discover Add a simple export button to this app
 ```
 
-5. Use the output to frame the task:
+6. Use the output to frame the task:
 
 ```text
 /frame Use the latest discovery and create a build plan
 ```
 
-6. Build only after the frame is clear:
+7. Build only after the frame is clear:
 
 ```text
 /build Implement the approved frame in small steps
 ```
 
-7. Run the review stage:
+8. Run the review stage:
 
 ```text
 /check Review the changes using the ForgeLoop reviewers
 ```
 
-8. Capture the learning:
+9. Capture the learning:
 
 ```text
 /capture Store the decision, reusable fix, and any changed facts
 ```
 
 Claude Code skills become slash commands when they are placed under `.claude/skills/<skill-name>/SKILL.md`.
+
+Do not run `pip install forgeloop` from PyPI. That name belongs to a different project. ForgeLoop does not publish a Python package; run its CLI from the repository root.
 
 Before reading older memory, ask ForgeLoop for a compact pointer packet:
 
@@ -289,7 +295,7 @@ pip install -e ".[tokenizers]"
 
 Use `compat` to check whether the expected Claude Code, Codex, Cursor, Copilot, Gemini, Windsurf, Cline, Roo, JetBrains AI, Kiro, OpenCode, Aider, and generic agent entry files exist.
 
-Use `doctor` as the fuller release health check. It combines structure validation, compatibility, secrets state, memory-index freshness, CI readiness, optional tokenizer availability, and OpenCLI integration status.
+Use `doctor` for a fuller local health and release-readiness check. It combines structure validation, profile-file presence, secrets state, memory-index freshness, CI readiness, optional tokenizer availability, and OpenCLI integration status. It does not query GitHub or verify a published release.
 
 ## GitHub Security Checks
 
@@ -413,7 +419,7 @@ Read:
 
 ## Tool Compatibility
 
-ForgeLoop is strongest in Claude Code, but now includes portable entry points for other AI coding tools:
+ForgeLoop is strongest in Claude Code and includes instruction profiles for other AI coding tools. Local checks confirm profile files exist; they do not certify live behaviour in each external product:
 
 - Claude Code: `CLAUDE.md`, `.claude/skills/`, `.claude/agents/`
 - Codex: `AGENTS.md`

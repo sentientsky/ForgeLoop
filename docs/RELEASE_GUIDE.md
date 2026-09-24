@@ -1,10 +1,10 @@
-# Release Guide
+# Source Alpha Release Guide
 
-Use this guide before publishing ForgeLoop to GitHub.
+ForgeLoop is released as a GitHub source archive. It is not currently a PyPI-installable toolkit.
 
 ## Release Gate
 
-Run:
+Use a clean virtual environment and run from the repository root:
 
 ```bash
 python -m pip install --require-hashes -r .github/requirements-ci.txt
@@ -15,96 +15,55 @@ python -m coverage report
 python -m forgeloop validate .
 python -m forgeloop doctor .
 python -m forgeloop compat .
+python -m forgeloop setup . --tool all-supported --dry-run
+python -m forgeloop opencli plan .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
 python -m forgeloop governance audit .
 python -m forgeloop governance verify .
-python -m forgeloop tokens "release readiness" . --limit 5
 python -m build --no-isolation
 python -m twine check dist/*
 python tests/package_smoke.py dist .
 ```
 
-Optional:
-
-```bash
-python -m forgeloop opencli status . --fetch-npm
-python -m forgeloop opencli plan . --fetch-npm --with-skills --run-doctor
-```
+Optional live OpenCLI checks must be explicit and run only in an approved test account/session.
 
 ## Manual Checks
 
-- No real `.env` files are in the repository.
-- No generated cache folders are committed.
-- No public token-saving claim lacks command evidence.
-- No optional integration installs silently.
-- Docs link to current commands.
-- New skills have evaluation examples or templates.
-- Memory index is current.
-- Issue templates, PR template, support docs, changelog, and publishing docs are present.
-- GitHub Actions use full commit SHA pins.
-- The release tag matches the package version.
-- Governance approval requirements are satisfied.
-- Governed-memory metadata is valid and no personal data appears in Git-tracked memory.
-- Any completed erasure claim has evidence from every affected external store.
+- No real `.env` files, credentials, or local setup files are tracked.
+- No generated caches or unrelated build artefacts enter the source archive.
+- Token claims are backed by reproducible command output.
+- Compatibility claims distinguish profile-file presence from an actual clean-session tool check.
+- The memory index is current and governed-memory metadata is valid.
+- Open security findings and Dependabot PRs are reviewed; a green workflow alone is not approval.
+- Release tag matches `pyproject.toml` version.
+- The source archive contains the full tracked project and passes the archive safety check.
+- The release includes a matching SHA-256 checksum; the archive attestation verifies against the expected repository.
+- Legal, certification, and third-party erasure claims have appropriate evidence and review.
 
-## Git Steps
+## Publish A GitHub Source Release
+
+1. Merge a reviewed release change to `main` and confirm all required CI, CodeQL, and fuzz checks pass.
+2. Update `CHANGELOG.md` and the version in `pyproject.toml`.
+3. Create a matching annotated tag, for example:
 
 ```bash
-git status --short
-git add .
-git status --short
-git commit -m "Prepare ForgeLoop release"
+git tag -a v0.1.0 -m "ForgeLoop 0.1.0 source alpha"
+git push origin v0.1.0
 ```
 
-Do not push until the remote repository, description, topics, and security settings are ready. Follow `docs/GITHUB_SETUP.md` for the one-time public launch.
+4. Wait for the tag-triggered Release workflow. It runs the release gate, builds and attests the complete source archive, checks it for local-only files, generates a SHA-256 checksum, and creates the GitHub Release.
+5. Verify the release page and attached assets. Check the checksum and provenance using the commands in `docs/PUBLISHING.md` before promoting it.
 
-For PyPI publishing, see `docs/PUBLISHING.md`.
-
-## GitHub Repository Settings
-
-Recommended settings:
-
-- enable secret scanning if available
-- enable push protection if available
-- require pull request review before merge
-- require CI before merge
-- add MIT licence
-- add topics: `ai`, `claude-code`, `codex`, `agentic-engineering`, `memory`, `developer-tools`
+The CLI wheel is built and tested internally but is not published or attached. Do not run `pip install forgeloop` from PyPI; that name is used by an unrelated project. Read `docs/PUBLISHING.md` before considering any future package-index distribution.
 
 ## Public Claims
 
 Use cautious language:
 
-- "measured packet reports"
-- "token-aware memory"
-- "pointer-first context"
-- "exact when tokenizer support is available"
+- measured packet-size reports
+- token-aware, pointer-first memory lookup
+- profile files are included for named tools
+- live compatibility is confirmed only when a dated clean-session acceptance record exists
 
-Avoid:
-
-- fixed percentage claims without benchmark evidence
-- claims that all tool integrations are deeply verified
-- claims that OpenCLI is bundled
-- claims of GDPR, EU AI Act, HIPAA, SOC 2, or third-party erasure compliance without appropriate evidence
-
-## Release Notes Template
-
-```text
-ForgeLoop public foundation release
-
-Included:
-- five-stage workflow
-- Claude Code skills and reviewers
-- portable AI tool entry files
-- local memory palace
-- Forge Context Packets
-- doctor and validation commands
-- external secrets workflow
-- optional OpenCLI peer integration
-
-Known limitations:
-- optional exact tokenisers are not installed by default
-- OpenCLI must be installed explicitly
-- live clean-session verification should be refreshed as tools evolve
-```
+Avoid fixed token-saving percentages without benchmark evidence, claims that all integrations are deeply verified, claims that OpenCLI is bundled, and unsupported legal/compliance claims.

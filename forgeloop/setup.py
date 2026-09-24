@@ -16,7 +16,7 @@ SUPPORTED_TOOLS = [
     {
         "id": "claude-code",
         "label": "Claude Code",
-        "support": "full",
+        "support": "primary",
         "usage": "State of Code 2025: 57%; SonarSource 2026: Claude / Claude Code 48%",
         "entry_files": [
             "CLAUDE.md",
@@ -35,7 +35,7 @@ SUPPORTED_TOOLS = [
     {
         "id": "codex",
         "label": "Codex",
-        "support": "full",
+        "support": "primary",
         "usage": "State of Code 2025: 23%; SonarSource 2026: OpenAI Codex 17%",
         "entry_files": [
             "AGENTS.md",
@@ -264,6 +264,9 @@ def setup_menu_text() -> str:
     lines = [
         "ForgeLoop setup",
         "",
+        "Choose a tool profile already included in this template.",
+        "This selection does not install or merge files into another repository.",
+        "",
         "Select your primary AI coding tool:",
     ]
     for index, tool in enumerate(SUPPORTED_TOOLS, start=1):
@@ -325,6 +328,7 @@ def format_setup_result(result: SetupResult, root: Path) -> str:
         f"Selected: {result.selected_label} ({result.support})",
         f"Local setup file: {result.config_path.relative_to(root)}",
         f"Written: {result.wrote_config}",
+        "This records a local preference only; it does not install or merge profile files.",
     ]
     if result.missing_files:
         lines.append("Missing entry files:")

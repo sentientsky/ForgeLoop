@@ -6,9 +6,9 @@ ForgeLoop is an early open source project. Please report security issues respons
 
 | Version | Supported |
 | --- | --- |
-| Latest `0.1.x` release | Yes |
+| Latest GitHub source release | Yes |
 | Unreleased `main` branch | Best effort |
-| Older versions | No |
+| Older source releases | No |
 
 ## Reporting A Vulnerability
 
@@ -39,6 +39,8 @@ ForgeLoop is especially careful about:
 ForgeLoop's repository memory is not a personal-data store. Store only opaque references in governed Markdown metadata and keep the data itself in an external provider with its own access control, retention, export, and deletion controls.
 
 Use `python -m forgeloop governance audit .` before committing governed-memory metadata. The local governance audit log is hash-chained and metadata-only; it is not an encryption system, legal certification, or proof that third-party embeddings, graphs, backups, or Git history have been erased.
+
+ForgeLoop is distributed as GitHub source. No PyPI package is published; do not use `pip install forgeloop`, which resolves to an unrelated project.
 
 ## Current Status
 

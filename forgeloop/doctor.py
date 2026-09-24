@@ -36,12 +36,14 @@ def doctor_report(root: Path) -> dict[str, Any]:
     )
 
     compat = compatibility_report(root)
-    missing_targets = [target["tool"] for target in compat["targets"] if not target["ready"]]
+    missing_targets = [target["tool"] for target in compat["targets"] if not target["profile_files_present"]]
     _add(
         checks,
         "compatibility",
         "error" if missing_targets else "ok",
-        "All configured AI coding tool profiles are present." if not missing_targets else "Some tool profiles are missing files.",
+        "All expected AI tool profile files are present; external tool behaviour is not tested here."
+        if not missing_targets
+        else "Some tool profile files are missing.",
         {"missing_targets": missing_targets},
     )
 
@@ -169,9 +171,11 @@ def doctor_report(root: Path) -> dict[str, Any]:
     missing_release = [path for path in release_files if not (root / path).is_file()]
     _add(
         checks,
-        "release-assets",
+        "release-readiness-files",
         "error" if missing_release else "ok",
-        "Production release assets are present." if not missing_release else "Some production release assets are missing.",
+        "Local release-readiness files are present; published GitHub releases are not checked."
+        if not missing_release
+        else "Some local release-readiness files are missing.",
         {"missing": missing_release},
     )
 
