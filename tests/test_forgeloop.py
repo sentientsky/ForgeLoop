@@ -414,8 +414,9 @@ class ValidationTests(unittest.TestCase):
     def test_validation_catches_public_url_placeholders(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            placeholder_owner = "<" + "YOUR" + "_ACCOUNT" + ">"
             (root / "README.md").write_text(
-                "Source: https://github.com/<YOUR_ACCOUNT>/ForgeLoop\n",
+                f"Source: https://github.com/{placeholder_owner}/ForgeLoop\n",
                 encoding="utf-8",
             )
 
