@@ -92,7 +92,7 @@ python -m forgeloop governance audit .
 python -m forgeloop governance verify .
 ```
 
-The optional local audit log is metadata-only and hash-chained. It is not a claim of legal certification or proof that a third-party embedding, graph, cache, backup, or Git history has been erased. Read `docs/governance/README.md` before using governed-memory metadata.
+The optional local audit log is metadata-only and hash-chained. New `erase` entries require an opaque pointer to evidence held outside ForgeLoop, but the log remains operator-attested and cannot verify third-party deletion. ForgeLoop has no provider deletion adapters and makes no legal-certification or erasure-completion claim. Read `docs/governance/README.md` before using governed-memory metadata.
 
 ## Repository Map
 
@@ -263,6 +263,7 @@ python -m forgeloop adopt ../my-project --tool claude-code
 python -m forgeloop adopt ../my-project --tool claude-code --apply
 python -m forgeloop compat .
 python -m forgeloop doctor .
+python -m forgeloop release gate .
 python -m forgeloop tokens "memory validation" . --limit 5
 python -m forgeloop intro
 python -m forgeloop index .
@@ -298,6 +299,8 @@ pip install -e ".[tokenizers]"
 Use `compat` to check whether the expected Claude Code, Codex, Cursor, Copilot, Gemini, Windsurf, Cline, Roo, JetBrains AI, Kiro, OpenCode, Aider, and generic agent entry files exist.
 
 Use `doctor` for a fuller local health and release-readiness check. It combines structure validation, profile-file presence, secrets state, memory-index freshness, CI readiness, optional tokenizer availability, and OpenCLI integration status. It does not query GitHub or verify a published release.
+
+Use `release gate` before public promotion. The default gate checks source-alpha and release-candidate readiness; `python -m forgeloop release gate . --target stable` remains blocked until Claude Code clean-session acceptance, independent human review, branch-protection review requirements, and provider-backed erasure evidence are real.
 
 ## GitHub Security Checks
 

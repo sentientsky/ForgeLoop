@@ -98,6 +98,7 @@ jobs:
           python -m forgeloop setup . --tool all-supported --dry-run
           python -m forgeloop compat .
           python -m forgeloop doctor .
+          python -m forgeloop release gate .
           python -m forgeloop opencli plan .
           python -m forgeloop pack "memory validation" . --limit 5
           python -m forgeloop tokens "memory validation" . --limit 5

@@ -35,6 +35,7 @@ from .opencli import (
     opencli_status,
     run_opencli_install,
 )
+from .release_gate import format_release_gate_report, release_gate_report
 from .secrets import check_secrets, external_secrets_path, init_external_secrets
 from .setup import format_setup_result, run_setup, setup_menu_text, supported_tool_ids
 from .tokens import build_token_report, format_token_report, supported_token_tools
@@ -86,6 +87,18 @@ def main(argv: list[str] | None = None) -> int:
     doctor_parser = subparsers.add_parser("doctor", help="check local ForgeLoop repository health and release readiness")
     doctor_parser.add_argument("root", nargs="?", default=".", help="repository root")
     doctor_parser.add_argument("--json", action="store_true", help="print machine-readable output")
+
+    release_parser = subparsers.add_parser("release", help="run release-readiness gates")
+    release_subparsers = release_parser.add_subparsers(dest="release_command", required=True)
+    release_gate = release_subparsers.add_parser("gate", help="decide whether ForgeLoop is ready to promote")
+    release_gate.add_argument("root", nargs="?", default=".", help="repository root")
+    release_gate.add_argument(
+        "--target",
+        choices=["source-alpha", "stable"],
+        default="source-alpha",
+        help="promotion target to evaluate",
+    )
+    release_gate.add_argument("--json", action="store_true", help="print machine-readable output")
 
     tokens_parser = subparsers.add_parser("tokens", help="measure context packet token savings by tool")
     tokens_parser.add_argument("query", help="task or memory query")
@@ -184,6 +197,10 @@ def main(argv: list[str] | None = None) -> int:
     governance_log.add_argument("--actor-ref", required=True, help="opaque operator reference, not a name or email")
     governance_log.add_argument("--record-ref", required=True, help="opaque record reference, not a file path")
     governance_log.add_argument("--subject-ref", help="optional opaque subject reference, not personal data")
+    governance_log.add_argument(
+        "--evidence-ref",
+        help="required for erase: opaque reference to provider evidence stored outside this log",
+    )
     governance_log.add_argument("--json", action="store_true", help="print machine-readable output")
     governance_verify = governance_subparsers.add_parser(
         "verify",
@@ -259,6 +276,14 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(report, indent=2))
         else:
             print(format_doctor_report(report))
+        return 0 if report["ok"] else 1
+
+    if args.command == "release" and args.release_command == "gate":
+        report = release_gate_report(root, target=args.target)
+        if args.json:
+            print(json.dumps(report, indent=2))
+        else:
+            print(format_release_gate_report(report))
         return 0 if report["ok"] else 1
 
     if args.command == "tokens":
@@ -432,6 +457,7 @@ def main(argv: list[str] | None = None) -> int:
                     actor_ref=args.actor_ref,
                     record_ref=args.record_ref,
                     subject_ref=args.subject_ref,
+                    evidence_ref=args.evidence_ref,
                 )
             except (OSError, ValueError) as exc:
                 print(f"Could not record governance event: {exc}", file=sys.stderr)

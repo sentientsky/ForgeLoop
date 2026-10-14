@@ -156,6 +156,7 @@ def doctor_report(root: Path) -> dict[str, Any]:
         "docs/ROADMAP.md": "roadmap and current status",
         "docs/PUBLISHING.md": "publishing guide",
         "docs/MAINTAINER_GUIDE.md": "maintainer guide",
+        "docs/RELEASE_CHECKLIST.md": "release checklist",
         "docs/GITHUB_SETUP.md": "GitHub setup guide",
         ".github/CODEOWNERS": "code owner routing",
         ".github/PULL_REQUEST_TEMPLATE.md": "pull request template",

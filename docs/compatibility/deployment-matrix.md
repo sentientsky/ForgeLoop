@@ -13,8 +13,8 @@ For repeatable clean-session prompts, see `docs/compatibility/deployment-evals/2
 
 | Tool | Profile level | Entry point | Evidence | Limitation |
 | --- | --- | --- | --- | --- |
-| Claude Code | Primary profile | `CLAUDE.md`, `.claude/skills/` | Files and metadata validated by CI; live check must be recorded per release | Real skill triggering and tool behaviour are not established by `compat`. |
-| Codex | Primary profile | `AGENTS.md` | Files present; live check must be recorded per release | Uses portable instructions rather than Claude skills. |
+| Claude Code | Primary profile | `CLAUDE.md`, `.claude/skills/` | Profile files validated by CI; 2026-09-24 fresh CLI attempt was blocked by API authentication failure | Acceptance has not passed; real skill triggering and tool behaviour are not established by `compat`. |
+| Codex | Primary profile | `AGENTS.md` | Files validated by CI; one fresh, ephemeral, read-only CLI acceptance passed on 2026-09-24 | CLI only; does not prove Codex desktop, all models, or runtime command behaviour. Uses portable instructions rather than Claude skills. |
 | Cursor | Profile provided | `.cursor/rules/forgeloop.mdc` | File presence only | Confirm rule activation and behaviour in the current client. |
 | GitHub Copilot | Profile provided | `.github/copilot-instructions.md` | File presence only | Workspace behaviour depends on Copilot client support. |
 | Gemini | Profile provided | `GEMINI.md` | File presence only | Exact token counts require provider tooling. |

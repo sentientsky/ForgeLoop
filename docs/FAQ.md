@@ -14,7 +14,7 @@ No. ForgeLoop rejects personal data in Git-tracked memory Markdown. It can check
 
 ## Can ForgeLoop prove a right-to-erasure request is complete?
 
-Not on its own. The audit log can record the governance event, but every embedding store, graph, cache, backup, export, provider, Git history, fork, and replica must be handled separately. Record erasure only after the responsible providers supply appropriate evidence.
+No. ForgeLoop has no provider deletion adapters. Every embedding store, graph, cache, backup, export, provider, Git history, fork, and replica must be handled separately. The CLI now requires an opaque evidence reference before recording an `erase` event, but that reference is operator-supplied and is not checked by ForgeLoop. The event is not proof of completed erasure.
 
 ## Does ForgeLoop make token usage lower?
 

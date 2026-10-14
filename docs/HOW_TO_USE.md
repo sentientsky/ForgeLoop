@@ -208,12 +208,13 @@ When a project needs to point to personal or special-category data stored in an 
 ```bash
 python -m forgeloop governance audit .
 python -m forgeloop governance log access . --actor-ref OPERATOR-001 --record-ref STORE-EXTERNAL-001 --subject-ref SUBJ-EXAMPLE-001
+python -m forgeloop governance log erase . --actor-ref OPERATOR-001 --record-ref STORE-EXTERNAL-001 --subject-ref SUBJ-EXAMPLE-001 --evidence-ref EVIDENCE-PACKET-001
 python -m forgeloop governance verify .
 ```
 
 The metadata must record the provenance, purpose, lawful basis, jurisdiction, retention deadline, and external storage reference. `subject_ref` must be an opaque identifier, never a name, email address, phone number, or account ID.
 
-ForgeLoop cannot delete data from third-party embeddings, graphs, backups, or Git history. Obtain evidence from every store before recording an `erase` event. Read `docs/governance/README.md` for the full boundary.
+ForgeLoop has no provider deletion adapters. Obtain and retain evidence from every affected store before recording an `erase` event. The required `--evidence-ref` is only an opaque pointer whose hash is logged; ForgeLoop does not inspect or verify the evidence. Read `docs/governance/README.md` for the full boundary.
 
 ## OpenCLI Integration
 

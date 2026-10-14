@@ -42,6 +42,7 @@ from forgeloop.opencli import (
 )
 from forgeloop.release_archive import forbidden_source_paths
 from forgeloop.release_archive import main as check_release_archive
+from forgeloop.release_gate import release_gate_report
 from forgeloop.secrets import (
     check_secrets,
     external_secrets_path,
@@ -144,6 +145,147 @@ class GovernanceTests(unittest.TestCase):
         self.assertEqual(1, valid_status["event_count"])
         self.assertNotIn("SUBJ-EXAMPLE-001", raw_log)
         self.assertFalse(invalid_status["valid"])
+
+    def test_governance_erase_requires_opaque_evidence_and_hashes_it(self) -> None:
+        from forgeloop import governance
+
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root = base / "repository"
+            root.mkdir()
+            with patch.dict(os.environ, {"FORGELOOP_GOVERNANCE_HOME": str(base / "config")}):
+                with self.assertRaisesRegex(ValueError, "requires an opaque reference"):
+                    record_audit_event(
+                        root,
+                        action="erase",
+                        actor_ref="OPERATOR-001",
+                        record_ref="STORE-EXTERNAL-001",
+                    )
+                with self.assertRaisesRegex(ValueError, "opaque upper-case identifier"):
+                    record_audit_event(
+                        root,
+                        action="erase",
+                        actor_ref="OPERATOR-001",
+                        record_ref="STORE-EXTERNAL-001",
+                        evidence_ref="evidence@example.com",
+                    )
+                with self.assertRaisesRegex(ValueError, "only accepted for an erase event"):
+                    record_audit_event(
+                        root,
+                        action="access",
+                        actor_ref="OPERATOR-001",
+                        record_ref="STORE-EXTERNAL-001",
+                        evidence_ref="EVIDENCE-PACKET-001",
+                    )
+                event = record_audit_event(
+                    root,
+                    action="erase",
+                    actor_ref="OPERATOR-001",
+                    record_ref="STORE-EXTERNAL-001",
+                    evidence_ref="EVIDENCE-PACKET-001",
+                )
+                status = verify_audit_log(root)
+                audit_log = next((base / "config/governance/audit").glob("*.jsonl"))
+                raw_log = audit_log.read_text(encoding="utf-8")
+                stored_event = json.loads(raw_log)
+
+        self.assertTrue(event["recorded"])
+        self.assertTrue(status["valid"])
+        self.assertEqual(governance._hash_reference("evidence", "EVIDENCE-PACKET-001"), stored_event["evidence_ref_hash"])
+        self.assertNotIn("EVIDENCE-PACKET-001", raw_log)
+
+    def test_governance_log_verifies_legacy_events_before_appending_v2(self) -> None:
+        from forgeloop import governance
+
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root = base / "repository"
+            root.mkdir()
+            with patch.dict(os.environ, {"FORGELOOP_GOVERNANCE_HOME": str(base / "config")}):
+                legacy_event = {
+                    "schema_version": "FGA/1",
+                    "event_id": "AUD-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "occurred_at": "2026-01-01T00:00:00Z",
+                    "action": "collect",
+                    "actor_ref_hash": governance._hash_reference("actor", "OPERATOR-001"),
+                    "record_ref_hash": governance._hash_reference("record", "STORE-EXTERNAL-001"),
+                    "subject_ref_hash": "",
+                    "previous_event_hash": "",
+                }
+                legacy_event["event_hash"] = governance._hash_event(legacy_event)
+                audit_log = governance._audit_log_path(root.resolve())
+                audit_log.parent.mkdir(parents=True)
+                audit_log.write_text(json.dumps(legacy_event) + "\n", encoding="utf-8")
+
+                self.assertTrue(verify_audit_log(root)["valid"])
+                record_audit_event(
+                    root,
+                    action="access",
+                    actor_ref="OPERATOR-001",
+                    record_ref="STORE-EXTERNAL-001",
+                )
+                status = verify_audit_log(root)
+
+        self.assertTrue(status["valid"])
+        self.assertEqual(2, status["event_count"])
+
+    def test_governance_verifier_reports_malformed_action_type_without_crashing(self) -> None:
+        from forgeloop import governance
+
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root = base / "repository"
+            root.mkdir()
+            with patch.dict(os.environ, {"FORGELOOP_GOVERNANCE_HOME": str(base / "config")}):
+                audit_log = governance._audit_log_path(root.resolve())
+                audit_log.parent.mkdir(parents=True)
+                malformed_event = {
+                    "schema_version": "FGA/2",
+                    "event_id": "AUD-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "occurred_at": "2026-01-01T00:00:00Z",
+                    "action": [],
+                    "actor_ref_hash": "a" * 64,
+                    "record_ref_hash": "b" * 64,
+                    "subject_ref_hash": "",
+                    "evidence_ref_hash": "",
+                    "previous_event_hash": "",
+                    "event_hash": "c" * 64,
+                }
+                audit_log.write_text(json.dumps(malformed_event) + "\n", encoding="utf-8")
+
+                status = verify_audit_log(root)
+
+        self.assertFalse(status["valid"])
+        self.assertIn("unsupported action", status["reason"])
+
+    def test_governance_erase_cli_refuses_to_record_without_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root = base / "repository"
+            root.mkdir()
+            output = StringIO()
+            error = StringIO()
+            with (
+                patch.dict(os.environ, {"FORGELOOP_GOVERNANCE_HOME": str(base / "config")}),
+                redirect_stdout(output),
+                redirect_stderr(error),
+            ):
+                result = main(
+                    [
+                        "governance",
+                        "log",
+                        "erase",
+                        str(root),
+                        "--actor-ref",
+                        "OPERATOR-001",
+                        "--record-ref",
+                        "STORE-EXTERNAL-001",
+                    ]
+                )
+
+        self.assertEqual(1, result)
+        self.assertIn("requires an opaque reference", error.getvalue())
+        self.assertEqual("", output.getvalue())
 
     def test_governance_log_refuses_personal_identifiers(self) -> None:
         with tempfile.TemporaryDirectory() as tmp, self.assertRaises(ValueError):
@@ -273,8 +415,9 @@ class ValidationTests(unittest.TestCase):
     def test_validation_catches_public_url_placeholders(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            placeholder_owner = "<" + "YOUR" + "_ACCOUNT" + ">"
             (root / "README.md").write_text(
-                "Source: https://github.com/<YOUR_ACCOUNT>/ForgeLoop\n",
+                f"Source: https://github.com/{placeholder_owner}/ForgeLoop\n",
                 encoding="utf-8",
             )
 
@@ -675,6 +818,42 @@ class DoctorTests(unittest.TestCase):
 
         self.assertIn("ForgeLoop doctor", output.getvalue())
         self.assertIn("opencli", output.getvalue())
+
+
+class ReleaseGateTests(unittest.TestCase):
+    def test_release_gate_passes_source_alpha_and_blocks_stable(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+
+        source_report = release_gate_report(root)
+        stable_report = release_gate_report(root, target="stable")
+
+        self.assertTrue(source_report["ok"])
+        self.assertTrue(source_report["source_alpha_ready"])
+        self.assertFalse(source_report["stable_ready"])
+        self.assertFalse(stable_report["ok"])
+        self.assertIn(
+            "stable-claude-acceptance",
+            {check["name"] for check in stable_report["checks"] if check["status"] == "block"},
+        )
+
+    def test_release_gate_cli_reports_decision(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        output = StringIO()
+
+        with redirect_stdout(output):
+            self.assertEqual(0, main(["release", "gate", str(root)]))
+
+        self.assertIn("ForgeLoop release gate", output.getvalue())
+        self.assertIn("Stable production ready: no", output.getvalue())
+
+    def test_release_gate_stable_cli_returns_nonzero_until_blockers_close(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        output = StringIO()
+
+        with redirect_stdout(output):
+            self.assertEqual(1, main(["release", "gate", str(root), "--target", "stable"]))
+
+        self.assertIn("Do not promote to stable production", output.getvalue())
 
 
 class OpenCLITests(unittest.TestCase):

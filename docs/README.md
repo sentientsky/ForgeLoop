@@ -34,6 +34,7 @@ Public user guides:
 
 Maintainer guides:
 
+- `RELEASE_CHECKLIST.md`
 - `RELEASE_GUIDE.md`
 - `PUBLISHING.md`
 - `MAINTAINER_GUIDE.md`
