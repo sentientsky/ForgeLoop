@@ -11,6 +11,16 @@ python -m forgeloop compat .
 python -m forgeloop status .
 ```
 
+## Release
+
+```bash
+python -m forgeloop release gate .
+python -m forgeloop release gate . --target stable
+python -m forgeloop release gate . --json
+```
+
+The default gate checks whether the repository is safe to promote as a source alpha or release candidate after review. The stable target intentionally fails until the documented human-review, Claude acceptance, branch-protection, and external-erasure evidence gates are closed.
+
 ## Setup
 
 ```bash

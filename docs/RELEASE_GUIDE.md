@@ -14,6 +14,7 @@ python -m coverage run -m unittest discover -s tests
 python -m coverage report
 python -m forgeloop validate .
 python -m forgeloop doctor .
+python -m forgeloop release gate .
 python -m forgeloop compat .
 python -m forgeloop setup . --tool all-supported --dry-run
 python -m forgeloop opencli plan .
@@ -41,6 +42,8 @@ Optional live OpenCLI checks must be explicit and run only in an approved test a
 - The source archive contains the full tracked project and passes the archive safety check.
 - The release includes a matching SHA-256 checksum; the archive attestation verifies against the expected repository.
 - Legal, certification, and third-party erasure claims have appropriate evidence and review.
+- `python -m forgeloop release gate .` passes for source-alpha promotion.
+- `python -m forgeloop release gate . --target stable` is allowed to fail while ForgeLoop remains labelled alpha.
 
 ## Publish A GitHub Source Release
 
@@ -57,6 +60,8 @@ git push origin v0.1.0
 5. Verify the release page and attached assets. Check the checksum and provenance using the commands in `docs/PUBLISHING.md` before promoting it.
 
 The CLI wheel is built and tested internally but is not published or attached. Do not run `pip install forgeloop` from PyPI; that name is used by an unrelated project. Read `docs/PUBLISHING.md` before considering any future package-index distribution.
+
+Use `docs/RELEASE_CHECKLIST.md` for the full promotion checklist, including the separate stable-production blockers.
 
 ## Public Claims
 

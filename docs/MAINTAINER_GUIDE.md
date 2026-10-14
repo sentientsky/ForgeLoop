@@ -14,6 +14,7 @@ python -m coverage run -m unittest discover -s tests
 python -m coverage report
 python -m forgeloop validate .
 python -m forgeloop doctor .
+python -m forgeloop release gate .
 python -m forgeloop compat .
 python -m forgeloop index . --check
 python -m forgeloop secrets check .
@@ -70,6 +71,14 @@ python fuzz/fuzz_frontmatter.py fuzz/corpus/frontmatter -atheris_runs=20000 -see
 Approval authority, sole-maintainer safeguards, and high-risk review rules live in `../GOVERNANCE.md`.
 
 For first-time repository publication and settings, follow `GITHUB_SETUP.md`.
+
+## Promotion Decisions
+
+Use `python -m forgeloop release gate .` before marking a release-critical pull request ready to merge. It checks the local source-alpha evidence and reports the stable-production blockers in one place.
+
+Use `python -m forgeloop release gate . --target stable` only when considering a stable promotion. A failure is expected while Claude Code clean-session acceptance, independent maintainer review, branch-protection approval requirements, and provider-backed erasure evidence remain open.
+
+Do not merge a release-critical change just because automation is green. Required checks prove that the tested commands passed; they do not prove product fitness, legal claims, external tool behaviour, or independent review.
 
 ## Release Notes
 

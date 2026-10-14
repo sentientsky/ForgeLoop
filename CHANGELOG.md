@@ -10,6 +10,7 @@ ForgeLoop follows practical semantic versioning:
 
 ## Unreleased
 
+- add a local `release gate` command and checklist that separate source-alpha promotion from blocked stable-production promotion
 - require an opaque evidence reference for new governed-memory erasure audit events, with backward-compatible verification of existing logs
 - record clean-session CLI acceptance evidence and explicitly keep production promotion on hold pending Claude authentication and independent human review
 - added preview-first, no-overwrite profile adoption for existing repositories, with rollback on failed writes

@@ -42,6 +42,7 @@ from forgeloop.opencli import (
 )
 from forgeloop.release_archive import forbidden_source_paths
 from forgeloop.release_archive import main as check_release_archive
+from forgeloop.release_gate import release_gate_report
 from forgeloop.secrets import (
     check_secrets,
     external_secrets_path,
@@ -817,6 +818,42 @@ class DoctorTests(unittest.TestCase):
 
         self.assertIn("ForgeLoop doctor", output.getvalue())
         self.assertIn("opencli", output.getvalue())
+
+
+class ReleaseGateTests(unittest.TestCase):
+    def test_release_gate_passes_source_alpha_and_blocks_stable(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+
+        source_report = release_gate_report(root)
+        stable_report = release_gate_report(root, target="stable")
+
+        self.assertTrue(source_report["ok"])
+        self.assertTrue(source_report["source_alpha_ready"])
+        self.assertFalse(source_report["stable_ready"])
+        self.assertFalse(stable_report["ok"])
+        self.assertIn(
+            "stable-claude-acceptance",
+            {check["name"] for check in stable_report["checks"] if check["status"] == "block"},
+        )
+
+    def test_release_gate_cli_reports_decision(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        output = StringIO()
+
+        with redirect_stdout(output):
+            self.assertEqual(0, main(["release", "gate", str(root)]))
+
+        self.assertIn("ForgeLoop release gate", output.getvalue())
+        self.assertIn("Stable production ready: no", output.getvalue())
+
+    def test_release_gate_stable_cli_returns_nonzero_until_blockers_close(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        output = StringIO()
+
+        with redirect_stdout(output):
+            self.assertEqual(1, main(["release", "gate", str(root), "--target", "stable"]))
+
+        self.assertIn("Do not promote to stable production", output.getvalue())
 
 
 class OpenCLITests(unittest.TestCase):
