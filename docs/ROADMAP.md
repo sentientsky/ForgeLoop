@@ -16,6 +16,7 @@ Automated evidence:
 
 ## Before Stable Promotion
 
+- Keep `docs/release/stable-evidence.json` blocked until each linked evidence record is current, reviewed, and complete. The manifest prevents documentation wording changes from silently changing the stable-release decision; it is not proof on its own.
 - Re-authenticate Claude Code interactively and repeat the clean-session CLI acceptance. Add desktop/UI acceptance only if a specific desktop integration is claimed.
 - Add a second trusted maintainer. Until then, independent human review is unavailable; do not count AI review or self-approval as a substitute.
 - Change branch protection to require at least one independent approval and code-owner review after a second maintainer is active. Current protection enforces nine CI contexts, but requires zero approvals and does not require code-owner review.

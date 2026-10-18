@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +23,15 @@ SOURCE_ALPHA_FILES = {
     ".github/workflows/fuzz.yml": "fuzz workflow",
     ".github/workflows/release.yml": "release workflow",
     ".github/CODEOWNERS": "code owner routing",
+    "docs/release/stable-evidence.json": "stable-evidence manifest",
+}
+
+STABLE_EVIDENCE_PATH = "docs/release/stable-evidence.json"
+MAX_STABLE_EVIDENCE_BYTES = 64_000
+STABLE_EVIDENCE_REQUIREMENTS = {
+    "claude_clean_session": ("tool_version", "command_ref", "working_tree"),
+    "independent_review": ("reviewer", "review_url", "branch_protection_checked"),
+    "external_erasure": ("provider", "evidence_ref", "verification_method"),
 }
 
 UNSUPPORTED_CLAIM_PATTERNS = {
@@ -87,45 +98,37 @@ def release_gate_report(root: Path, target: str = "source-alpha") -> dict[str, A
         {"matches": unsupported_claims},
     )
 
-    acceptance_text = _read(root / "docs/compatibility/deployment-evals/2026-05-18-clean-session-acceptance.md")
-    claude_blocked = "blocked by API authentication" in acceptance_text or "not evidence" in acceptance_text
-    _add(
-        checks,
-        "stable-claude-acceptance",
-        "block" if claude_blocked else "pass",
-        "Claude Code clean-session acceptance is still blocked or incomplete."
-        if claude_blocked
-        else "Claude Code clean-session acceptance has a current passing evidence record.",
-    )
-
-    roadmap_text = _read(root / "docs/ROADMAP.md")
-    governance_text = _read(root / "GOVERNANCE.md")
-    independent_review_blocked = "Add a second trusted maintainer" in roadmap_text or "only one active maintainer" in governance_text
-    _add(
-        checks,
-        "stable-independent-review",
-        "block" if independent_review_blocked else "pass",
-        "Independent maintainer review is not yet available."
-        if independent_review_blocked
-        else "Independent maintainer review is available and documented.",
-    )
-
-    governance_docs = _read(root / "docs/governance/README.md") + "\n" + _read(
-        root / "docs/checks/2026-09-24-production-closure-audit.md"
-    )
-    external_erasure_blocked = (
-        "no external-store connector" in governance_docs
-        or "no provider deletion adapter" in governance_docs
-        or "cannot verify third-party deletion" in governance_docs
-    )
-    _add(
-        checks,
-        "stable-external-erasure-evidence",
-        "block" if external_erasure_blocked else "pass",
-        "External-store erasure remains operator-attested, not provider-verified."
-        if external_erasure_blocked
-        else "External-store erasure has provider-specific verification evidence.",
-    )
+    stable_evidence, stable_evidence_error = _load_stable_evidence(root)
+    for evidence_name, check_name, passed_message, blocked_message in (
+        (
+            "claude_clean_session",
+            "stable-claude-acceptance",
+            "Claude Code clean-session acceptance has a current structured evidence record.",
+            "Claude Code clean-session acceptance is still blocked or incomplete.",
+        ),
+        (
+            "independent_review",
+            "stable-independent-review",
+            "Independent maintainer review has a current structured evidence record.",
+            "Independent maintainer review is not yet available.",
+        ),
+        (
+            "external_erasure",
+            "stable-external-erasure-evidence",
+            "External-store erasure has provider-specific structured verification evidence.",
+            "External-store erasure remains operator-attested, not provider-verified.",
+        ),
+    ):
+        passed, reason, details = _stable_evidence_status(
+            root, stable_evidence, stable_evidence_error, evidence_name
+        )
+        _add(
+            checks,
+            check_name,
+            "pass" if passed else "block",
+            passed_message if passed else f"{blocked_message} {reason}",
+            details,
+        )
 
     failures = [check for check in checks if check["status"] == "fail"]
     blockers = [check for check in checks if check["status"] == "block"]
@@ -191,6 +194,80 @@ def _read(path: Path) -> str:
     if not path.is_file():
         return ""
     return path.read_text(encoding="utf-8", errors="replace")
+
+
+def _load_stable_evidence(root: Path) -> tuple[dict[str, Any] | None, str | None]:
+    path = root / STABLE_EVIDENCE_PATH
+    try:
+        if path.stat().st_size > MAX_STABLE_EVIDENCE_BYTES:
+            return None, "The stable-evidence manifest exceeds the size limit."
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return None, "The stable-evidence manifest is missing."
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None, "The stable-evidence manifest is unreadable or invalid JSON."
+
+    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+        return None, "The stable-evidence manifest has an unsupported schema."
+    return payload, None
+
+
+def _stable_evidence_status(
+    root: Path,
+    manifest: dict[str, Any] | None,
+    manifest_error: str | None,
+    evidence_name: str,
+) -> tuple[bool, str, dict[str, str]]:
+    if manifest_error:
+        return False, manifest_error, {}
+    assert manifest is not None
+
+    entry = manifest.get(evidence_name)
+    if not isinstance(entry, dict):
+        return False, "The required evidence entry is missing.", {}
+    if entry.get("status") != "passed":
+        return False, "The evidence entry is deliberately marked blocked.", {}
+
+    evidence_path = entry.get("evidence_path")
+    if not _is_safe_evidence_path(root, evidence_path):
+        return False, "The evidence path is missing, unsafe, or unavailable.", {}
+    if not _is_iso_date(entry.get("updated_on")):
+        return False, "The evidence date is missing, malformed, or in the future.", {}
+
+    for field in STABLE_EVIDENCE_REQUIREMENTS[evidence_name]:
+        value = entry.get(field)
+        if evidence_name == "independent_review" and field == "branch_protection_checked":
+            if value is not True:
+                return False, "The branch-protection check is not recorded as passed.", {}
+            continue
+        if not _is_short_text(value):
+            return False, "The evidence entry is missing required structured details.", {}
+
+    return True, "", {"evidence_path": str(evidence_path), "updated_on": str(entry["updated_on"])}
+
+
+def _is_safe_evidence_path(root: Path, value: Any) -> bool:
+    if not isinstance(value, str) or not value.startswith("docs/") or "\\" in value:
+        return False
+    candidate = (root / value).resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError:
+        return False
+    return candidate.is_file()
+
+
+def _is_iso_date(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        return date.fromisoformat(value) <= datetime.now(timezone.utc).date()
+    except ValueError:
+        return False
+
+
+def _is_short_text(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip()) and len(value) <= 240 and "\n" not in value and "\r" not in value
 
 
 def _add(
