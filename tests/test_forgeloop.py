@@ -885,6 +885,36 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertTrue(report["ok"])
         self.assertTrue(report["stable_ready"])
 
+    def test_stable_gate_blocks_expired_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["claude_clean_session"]["valid_until"] = "2020-01-01"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        claude_check = next(item for item in report["checks"] if item["name"] == "stable-claude-acceptance")
+        self.assertEqual("block", claude_check["status"])
+        self.assertIn("expired", claude_check["message"])
+
+    def test_stable_gate_rejects_evidence_path_escape(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["external_erasure"]["evidence_path"] = "../../outside.md"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        erasure_check = next(item for item in report["checks"] if item["name"] == "stable-external-erasure-evidence")
+        self.assertEqual("block", erasure_check["status"])
+        self.assertIn("unsafe", erasure_check["message"])
+
     @staticmethod
     def _write_release_fixture(root: Path) -> None:
         for relative_path in SOURCE_ALPHA_FILES:
@@ -908,6 +938,7 @@ class ReleaseGateTests(unittest.TestCase):
                 "tool_version": "2.1.0",
                 "command_ref": "docs/evidence/claude.md",
                 "working_tree": "unchanged",
+                "valid_until": "2999-12-31",
             },
             "independent_review": {
                 "status": "passed",
@@ -916,6 +947,7 @@ class ReleaseGateTests(unittest.TestCase):
                 "reviewer": "trusted-maintainer",
                 "review_url": "https://github.com/example/repo/pull/1",
                 "branch_protection_checked": True,
+                "valid_until": "2999-12-31",
             },
             "external_erasure": {
                 "status": "passed",
@@ -924,6 +956,7 @@ class ReleaseGateTests(unittest.TestCase):
                 "provider": "example-provider",
                 "evidence_ref": "EVIDENCE-PACKET-001",
                 "verification_method": "provider deletion receipt and repeatable integration test",
+                "valid_until": "2999-12-31",
             },
         }
 

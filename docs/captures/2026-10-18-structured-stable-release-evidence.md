@@ -26,7 +26,7 @@ The release gate validates this manifest's shape and paths; it does not contact 
 
 ## Decision Or Lesson
 
-Treat release readiness as structured evidence with fail-closed defaults. Prose is useful for explanation, but it is too easy for an editorial change to alter an automated release decision accidentally.
+Treat release readiness as structured evidence with fail-closed defaults and explicit expiry dates. Prose is useful for explanation, but it is too easy for an editorial change to alter an automated release decision accidentally, and an unexpired record should not stay valid forever.
 
 ## Why It Matters
 

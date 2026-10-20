@@ -29,9 +29,9 @@ SOURCE_ALPHA_FILES = {
 STABLE_EVIDENCE_PATH = "docs/release/stable-evidence.json"
 MAX_STABLE_EVIDENCE_BYTES = 64_000
 STABLE_EVIDENCE_REQUIREMENTS = {
-    "claude_clean_session": ("tool_version", "command_ref", "working_tree"),
-    "independent_review": ("reviewer", "review_url", "branch_protection_checked"),
-    "external_erasure": ("provider", "evidence_ref", "verification_method"),
+    "claude_clean_session": ("tool_version", "command_ref", "working_tree", "valid_until"),
+    "independent_review": ("reviewer", "review_url", "branch_protection_checked", "valid_until"),
+    "external_erasure": ("provider", "evidence_ref", "verification_method", "valid_until"),
 }
 
 UNSUPPORTED_CLAIM_PATTERNS = {
@@ -233,6 +233,8 @@ def _stable_evidence_status(
         return False, "The evidence path is missing, unsafe, or unavailable.", {}
     if not _is_iso_date(entry.get("updated_on")):
         return False, "The evidence date is missing, malformed, or in the future.", {}
+    if not _is_current_validity(entry.get("valid_until")):
+        return False, "The evidence is expired or has no valid expiry date.", {}
 
     for field in STABLE_EVIDENCE_REQUIREMENTS[evidence_name]:
         value = entry.get(field)
@@ -262,6 +264,15 @@ def _is_iso_date(value: Any) -> bool:
         return False
     try:
         return date.fromisoformat(value) <= datetime.now(timezone.utc).date()
+    except ValueError:
+        return False
+
+
+def _is_current_validity(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        return date.fromisoformat(value) >= datetime.now(timezone.utc).date()
     except ValueError:
         return False
 

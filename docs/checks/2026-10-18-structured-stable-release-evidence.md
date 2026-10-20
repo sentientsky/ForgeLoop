@@ -11,7 +11,7 @@ tags: [release, governance, security, evidence]
 
 ## Summary
 
-The stable release gate no longer infers three critical promotion conditions from Markdown phrases. It now reads a size-bounded, versioned JSON manifest whose default entries are deliberately blocked. A passing entry must link to a safe repository evidence path, have a non-future ISO date, and include role-specific fields for Claude acceptance, independent review, or provider erasure verification.
+The stable release gate no longer infers three critical promotion conditions from Markdown phrases. It now reads a size-bounded, versioned JSON manifest whose default entries are deliberately blocked. A passing entry must link to a safe repository evidence path, have a non-future ISO date, include an unexpired `valid_until` date, and include role-specific fields for Claude acceptance, independent review, or provider erasure verification.
 
 ## Validation
 
@@ -44,7 +44,7 @@ The stable release gate no longer infers three critical promotion conditions fro
 
 - P1: None found.
 - P2: None found.
-- P3: New tests cover a valid structured-evidence fixture and a missing required erasure field.
+- P3: New tests cover valid structured evidence, a missing required erasure field, an expired record, and a path escape.
 
 ### Documentation
 
