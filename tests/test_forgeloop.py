@@ -42,7 +42,7 @@ from forgeloop.opencli import (
 )
 from forgeloop.release_archive import forbidden_source_paths
 from forgeloop.release_archive import main as check_release_archive
-from forgeloop.release_gate import release_gate_report
+from forgeloop.release_gate import SOURCE_ALPHA_FILES, release_gate_report
 from forgeloop.secrets import (
     check_secrets,
     external_secrets_path,
@@ -854,6 +854,156 @@ class ReleaseGateTests(unittest.TestCase):
             self.assertEqual(1, main(["release", "gate", str(root), "--target", "stable"]))
 
         self.assertIn("Do not promote to stable production", output.getvalue())
+
+    def test_stable_gate_rejects_malformed_structured_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["external_erasure"].pop("provider")
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        erasure_check = next(item for item in report["checks"] if item["name"] == "stable-external-erasure-evidence")
+        self.assertFalse(report["ok"])
+        self.assertEqual("block", erasure_check["status"])
+        self.assertIn("missing required structured details", erasure_check["message"])
+
+    def test_stable_gate_accepts_complete_structured_attestation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            (root / "docs/release/stable-evidence.json").write_text(
+                json.dumps(self._passing_stable_evidence()), encoding="utf-8"
+            )
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        self.assertTrue(report["ok"])
+        self.assertTrue(report["stable_ready"])
+
+    def test_stable_gate_requires_canonical_clean_session_tree_status(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["claude_clean_session"]["working_tree"] = "clean enough"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        claude_check = next(item for item in report["checks"] if item["name"] == "stable-claude-acceptance")
+        self.assertEqual("block", claude_check["status"])
+        self.assertIn("unchanged working tree", claude_check["message"])
+
+    def test_stable_gate_requires_secure_github_pull_request_review_url(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["independent_review"]["review_url"] = "http://example.test/review/1"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        review_check = next(item for item in report["checks"] if item["name"] == "stable-independent-review")
+        self.assertEqual("block", review_check["status"])
+        self.assertIn("HTTPS GitHub", review_check["message"])
+
+    def test_stable_gate_requires_opaque_erasure_evidence_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["external_erasure"]["evidence_ref"] = "receipt@example.com"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        erasure_check = next(item for item in report["checks"] if item["name"] == "stable-external-erasure-evidence")
+        self.assertEqual("block", erasure_check["status"])
+        self.assertIn("opaque upper-case", erasure_check["message"])
+
+    def test_stable_gate_blocks_expired_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["claude_clean_session"]["valid_until"] = "2020-01-01"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        claude_check = next(item for item in report["checks"] if item["name"] == "stable-claude-acceptance")
+        self.assertEqual("block", claude_check["status"])
+        self.assertIn("expired", claude_check["message"])
+
+    def test_stable_gate_rejects_evidence_path_escape(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["external_erasure"]["evidence_path"] = "../../outside.md"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        erasure_check = next(item for item in report["checks"] if item["name"] == "stable-external-erasure-evidence")
+        self.assertEqual("block", erasure_check["status"])
+        self.assertIn("unsafe", erasure_check["message"])
+
+    @staticmethod
+    def _write_release_fixture(root: Path) -> None:
+        for relative_path in SOURCE_ALPHA_FILES:
+            path = root / relative_path
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("fixture\n", encoding="utf-8")
+        (root / "pyproject.toml").write_text("Development Status :: 3 - Alpha\n", encoding="utf-8")
+        for name in ("claude", "review", "erasure"):
+            path = root / f"docs/evidence/{name}.md"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("fixture evidence\n", encoding="utf-8")
+
+    @staticmethod
+    def _passing_stable_evidence() -> dict[str, object]:
+        return {
+            "schema_version": 1,
+            "claude_clean_session": {
+                "status": "passed",
+                "updated_on": "2026-10-18",
+                "evidence_path": "docs/evidence/claude.md",
+                "tool_version": "2.1.0",
+                "command_ref": "docs/evidence/claude.md",
+                "working_tree": "unchanged",
+                "valid_until": "2999-12-31",
+            },
+            "independent_review": {
+                "status": "passed",
+                "updated_on": "2026-10-18",
+                "evidence_path": "docs/evidence/review.md",
+                "reviewer": "trusted-maintainer",
+                "review_url": "https://github.com/example/repo/pull/1",
+                "branch_protection_checked": True,
+                "valid_until": "2999-12-31",
+            },
+            "external_erasure": {
+                "status": "passed",
+                "updated_on": "2026-10-18",
+                "evidence_path": "docs/evidence/erasure.md",
+                "provider": "example-provider",
+                "evidence_ref": "EVIDENCE-PACKET-001",
+                "verification_method": "provider deletion receipt and repeatable integration test",
+                "valid_until": "2999-12-31",
+            },
+        }
 
 
 class OpenCLITests(unittest.TestCase):
