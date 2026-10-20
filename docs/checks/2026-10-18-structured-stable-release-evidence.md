@@ -11,12 +11,12 @@ tags: [release, governance, security, evidence]
 
 ## Summary
 
-The stable release gate no longer infers three critical promotion conditions from Markdown phrases. It now reads a size-bounded, versioned JSON manifest whose default entries are deliberately blocked. A passing entry must link to a safe repository evidence path, have a non-future ISO date, include an unexpired `valid_until` date, and include role-specific fields for Claude acceptance, independent review, or provider erasure verification.
+The stable release gate no longer infers three critical promotion conditions from Markdown phrases. It now reads a size-bounded, versioned JSON manifest whose default entries are deliberately blocked. A passing entry must link to a safe repository evidence path, have a non-future ISO date, include an unexpired `valid_until` date, and include constrained role-specific fields for Claude acceptance, independent review, or provider erasure verification. It validates an attestation, not the external facts themselves.
 
 ## Validation
 
 - `python -m unittest discover -s tests`
-  - Passed: 70 tests.
+  - Passed: 75 tests.
 - `python -m ruff check forgeloop tests`
   - Passed.
 - `python -m coverage run -m unittest discover -s tests && python -m coverage report`
@@ -38,13 +38,13 @@ The stable release gate no longer infers three critical promotion conditions fro
 
 - P1: None found.
 - P2: None found.
-- P3: Evidence paths are restricted to existing files under `docs/`; the manifest never accepts provider URLs, credentials, or external file paths.
+- P3: Evidence paths are restricted to existing files under `docs/`; the manifest never accepts provider URLs, credentials, or external file paths. Passed entries require an unchanged working-tree marker, an HTTPS GitHub pull-request URL, and an opaque erasure-evidence reference.
 
 ### Testing
 
 - P1: None found.
 - P2: None found.
-- P3: New tests cover valid structured evidence, a missing required erasure field, an expired record, and a path escape.
+- P3: New tests cover a valid structured attestation, a missing required erasure field, an expired record, a path escape, a non-canonical working-tree marker, an insecure review URL, and a non-opaque erasure reference.
 
 ### Documentation
 

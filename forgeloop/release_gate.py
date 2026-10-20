@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from .doctor import doctor_report
 
@@ -28,6 +30,7 @@ SOURCE_ALPHA_FILES = {
 
 STABLE_EVIDENCE_PATH = "docs/release/stable-evidence.json"
 MAX_STABLE_EVIDENCE_BYTES = 64_000
+OPAQUE_EVIDENCE_REFERENCE_RE = re.compile(r"^[A-Z][A-Z0-9_-]{2,63}$")
 STABLE_EVIDENCE_REQUIREMENTS = {
     "claude_clean_session": ("tool_version", "command_ref", "working_tree", "valid_until"),
     "independent_review": ("reviewer", "review_url", "branch_protection_checked", "valid_until"),
@@ -242,6 +245,18 @@ def _stable_evidence_status(
             if value is not True:
                 return False, "The branch-protection check is not recorded as passed.", {}
             continue
+        if evidence_name == "claude_clean_session" and field == "working_tree":
+            if value != "unchanged":
+                return False, "The clean-session evidence must record an unchanged working tree.", {}
+            continue
+        if evidence_name == "independent_review" and field == "review_url":
+            if not _is_github_pull_request_url(value):
+                return False, "The independent-review evidence needs an HTTPS GitHub pull-request URL.", {}
+            continue
+        if evidence_name == "external_erasure" and field == "evidence_ref":
+            if not _is_opaque_evidence_reference(value):
+                return False, "The erasure evidence reference must be an opaque upper-case identifier.", {}
+            continue
         if not _is_short_text(value):
             return False, "The evidence entry is missing required structured details.", {}
 
@@ -279,6 +294,23 @@ def _is_current_validity(value: Any) -> bool:
 
 def _is_short_text(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip()) and len(value) <= 240 and "\n" not in value and "\r" not in value
+
+
+def _is_github_pull_request_url(value: Any) -> bool:
+    if not _is_short_text(value):
+        return False
+    parsed = urlparse(value)
+    return (
+        parsed.scheme == "https"
+        and parsed.netloc == "github.com"
+        and not parsed.query
+        and not parsed.fragment
+        and bool(re.fullmatch(r"/[^/]+/[^/]+/pull/[1-9][0-9]*", parsed.path))
+    )
+
+
+def _is_opaque_evidence_reference(value: Any) -> bool:
+    return isinstance(value, str) and bool(OPAQUE_EVIDENCE_REFERENCE_RE.fullmatch(value))
 
 
 def _add(

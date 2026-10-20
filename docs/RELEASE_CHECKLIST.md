@@ -50,7 +50,7 @@ python -m forgeloop release gate . --target stable
 
 Do not promote ForgeLoop as stable production until this command passes and the following are true:
 
-- `docs/release/stable-evidence.json` is updated from `blocked` to `passed` only after a maintainer has reviewed the linked evidence, and each record has a current `valid_until` date. The release gate validates this manifest's shape, dates, and paths; it does not contact external providers or replace human review.
+- `docs/release/stable-evidence.json` is updated from `blocked` to `passed` only after a maintainer has reviewed the linked evidence, and each record has a current `valid_until` date. The release gate validates this manifest's shape, dates, paths, and constrained attestation fields; it does not contact external providers, authenticate a tool session, or replace human review.
 - Claude Code has a fresh clean-session acceptance record with the exact command, result, date, tool version, and unchanged working tree.
 - At least one trusted independent maintainer can review and approve changes.
 - Branch protection requires passing checks, conversation resolution, one independent approval, and code-owner review.

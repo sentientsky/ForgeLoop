@@ -871,7 +871,7 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertEqual("block", erasure_check["status"])
         self.assertIn("missing required structured details", erasure_check["message"])
 
-    def test_stable_gate_accepts_complete_structured_evidence(self) -> None:
+    def test_stable_gate_accepts_complete_structured_attestation(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
             self._write_release_fixture(root)
@@ -884,6 +884,51 @@ class ReleaseGateTests(unittest.TestCase):
 
         self.assertTrue(report["ok"])
         self.assertTrue(report["stable_ready"])
+
+    def test_stable_gate_requires_canonical_clean_session_tree_status(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["claude_clean_session"]["working_tree"] = "clean enough"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        claude_check = next(item for item in report["checks"] if item["name"] == "stable-claude-acceptance")
+        self.assertEqual("block", claude_check["status"])
+        self.assertIn("unchanged working tree", claude_check["message"])
+
+    def test_stable_gate_requires_secure_github_pull_request_review_url(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["independent_review"]["review_url"] = "http://example.test/review/1"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        review_check = next(item for item in report["checks"] if item["name"] == "stable-independent-review")
+        self.assertEqual("block", review_check["status"])
+        self.assertIn("HTTPS GitHub", review_check["message"])
+
+    def test_stable_gate_requires_opaque_erasure_evidence_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._write_release_fixture(root)
+            evidence = self._passing_stable_evidence()
+            evidence["external_erasure"]["evidence_ref"] = "receipt@example.com"
+            (root / "docs/release/stable-evidence.json").write_text(json.dumps(evidence), encoding="utf-8")
+
+            with patch("forgeloop.release_gate.doctor_report", return_value={"ok": True}):
+                report = release_gate_report(root, target="stable")
+
+        erasure_check = next(item for item in report["checks"] if item["name"] == "stable-external-erasure-evidence")
+        self.assertEqual("block", erasure_check["status"])
+        self.assertIn("opaque upper-case", erasure_check["message"])
 
     def test_stable_gate_blocks_expired_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

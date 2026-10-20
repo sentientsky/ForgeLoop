@@ -21,12 +21,12 @@ ForgeLoop's stable release gate now validates `docs/release/stable-evidence.json
 Use this section when the original wording matters.
 
 ```text
-The release gate validates this manifest's shape and paths; it does not contact external providers or replace human review.
+The release gate validates this manifest's shape, dates, paths, and constrained attestation fields; it does not contact external providers, authenticate a tool session, or replace human review.
 ```
 
 ## Decision Or Lesson
 
-Treat release readiness as structured evidence with fail-closed defaults and explicit expiry dates. Prose is useful for explanation, but it is too easy for an editorial change to alter an automated release decision accidentally, and an unexpired record should not stay valid forever.
+Treat release readiness as structured evidence with fail-closed defaults, explicit expiry dates, and bounded field formats. Prose is useful for explanation, but it is too easy for an editorial change to alter an automated release decision accidentally, and an unexpired record should not stay valid forever. A machine-validated attestation still cannot prove a provider action or a human review.
 
 ## Why It Matters
 
