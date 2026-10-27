@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "claude_clean_session": {
+    "status": "blocked",
+    "updated_on": "2026-10-20",
+    "valid_until": "2026-11-19",
+    "evidence_path": "docs/compatibility/deployment-evals/2026-05-18-clean-session-acceptance.md",
+    "reason": "The 2026-10-20 clean-session retry failed because the installed Claude Code OAuth token was invalid; interactive re-authentication is required."
+  },
+  "independent_review": {
+    "status": "blocked",
+    "updated_on": "2026-10-18",
+    "valid_until": "2026-11-17",
+    "evidence_path": "docs/checks/2026-09-24-production-closure-audit.md",
+    "reason": "A trusted independent maintainer and review history are required before this may pass."
+  },
+  "external_erasure": {
+    "status": "blocked",
+    "updated_on": "2026-10-18",
+    "valid_until": "2026-11-17",
+    "evidence_path": "docs/governance/README.md",
+    "reason": "No provider-specific deletion adapter, evidence bundle, and repeatable integration test exist."
+  }
+}
