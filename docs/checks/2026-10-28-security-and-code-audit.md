@@ -28,13 +28,14 @@ The repository audit found and fixed a local setup-file symlink overwrite, an af
 - ForgeLoop repository validation, setup dry run, compatibility, doctor, release gate, OpenCLI plan, context/token report, secret check, governance checks, and memory-index check passed.
 - Source and wheel builds, Twine metadata checks, and the installed-wheel smoke test passed.
 - `git diff --check` passed.
+- GitHub CI passed on commit `d14cbcba9508fdb2c72e24344470178c433215db`: Python 3.10-3.14 on Ubuntu, Windows, and macOS; package quality; CodeQL; and fuzz checks.
 
 ## Remaining Limits
 
 - Claude Code clean-session acceptance still requires valid user authentication and a real interactive session.
 - Independent maintainer review requires a separate human reviewer.
 - External-store erasure guarantees require provider-specific evidence. ForgeLoop does not claim these gates have passed.
-- GitHub hosted CI must run on the updated commit before this change is considered merged or released.
+- Pull request #44 remains open for independent human review. The Scorecard vulnerability alert is still open against `main` and must be rechecked after a reviewed remediation reaches the default branch and Scorecard reruns.
 
 ## External References
 
