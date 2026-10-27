@@ -399,13 +399,17 @@ def _combined_profile() -> dict[str, Any]:
 
 
 def _local_setup_path(root: Path) -> Path:
-    path = (root / LOCAL_SETUP_FILE).resolve()
-    if path != root and root not in path.parents:
-        raise ValueError("Local setup path escapes repository root")
+    root = root.resolve()
+    path = root / LOCAL_SETUP_FILE
+    if path.is_symlink():
+        raise ValueError("Refusing to write setup through a symlink")
     if _has_symlink_ancestor(path.parent, root):
         raise ValueError("Refusing to write setup inside a symlinked folder")
-    if path.exists() and path.is_symlink():
-        raise ValueError("Refusing to write setup through a symlink")
+    resolved_path = path.resolve()
+    if resolved_path != root and root not in resolved_path.parents:
+        raise ValueError("Local setup path escapes repository root")
+    if path.exists() and not path.is_file():
+        raise ValueError("Local setup path must be a regular file")
     return path
 
 

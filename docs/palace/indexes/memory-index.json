@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_by": "forgeloop 0.1.0",
-  "record_count": 32,
+  "record_count": 33,
   "records": [
     {
       "path": "docs/captures/2026-04-17-external-secrets-outside-repository.md",
@@ -317,6 +317,23 @@
         "evidence"
       ],
       "valid_from": "2026-10-18",
+      "valid_to": "",
+      "supersedes": "",
+      "superseded_by": ""
+    },
+    {
+      "path": "docs/captures/2026-10-28-security-audit-fixes.md",
+      "title": "Capture: Security Audit Fixes",
+      "type": "capture",
+      "status": "current",
+      "tags": [
+        "security",
+        "audit",
+        "setup",
+        "dependencies",
+        "release"
+      ],
+      "valid_from": "2026-10-28",
       "valid_to": "",
       "supersedes": "",
       "superseded_by": ""

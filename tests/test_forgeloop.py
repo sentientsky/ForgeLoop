@@ -51,6 +51,7 @@ from forgeloop.secrets import (
 )
 from forgeloop.setup import (
     ALL_SUPPORTED_ID,
+    LOCAL_SETUP_FILE,
     SUPPORTED_TOOLS,
     run_setup,
     setup_menu_text,
@@ -1186,6 +1187,23 @@ class SetupMenuTests(unittest.TestCase):
 
             self.assertTrue(result.wrote_config)
             self.assertEqual("codex", payload["selected_tool"])
+
+    def test_setup_refuses_symlinked_config_without_modifying_target(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            target = root / "README.md"
+            target.write_text("# User content\n", encoding="utf-8")
+            config_path = root / LOCAL_SETUP_FILE
+            try:
+                config_path.symlink_to(target)
+            except OSError as exc:
+                self.skipTest(f"file symlinks unavailable: {exc}")
+
+            with self.assertRaisesRegex(ValueError, "through a symlink"):
+                run_setup(root, tool_id="codex")
+
+            self.assertEqual("# User content\n", target.read_text(encoding="utf-8"))
+            self.assertTrue(config_path.is_symlink())
 
 
 class AdoptionTests(unittest.TestCase):

@@ -223,7 +223,8 @@ def _stable_evidence_status(
 ) -> tuple[bool, str, dict[str, str]]:
     if manifest_error:
         return False, manifest_error, {}
-    assert manifest is not None
+    if manifest is None:
+        return False, "The stable-evidence manifest is unavailable.", {}
 
     entry = manifest.get(evidence_name)
     if not isinstance(entry, dict):
