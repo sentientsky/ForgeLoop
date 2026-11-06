@@ -346,7 +346,7 @@ def main(argv: list[str] | None = None) -> int:
         try:
             payload = _load_json_payload(args.input)
             result = simulate_hook_event(root, args.event, payload, interval=args.interval)
-        except (OSError, json.JSONDecodeError, ValueError) as exc:
+        except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
             print(f"Could not simulate hook: {exc}", file=sys.stderr)
             return 1
         output = {
