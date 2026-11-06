@@ -13,6 +13,7 @@ ForgeLoop follows practical semantic versioning:
 - hardened stable-promotion evidence checks with current, structured attestations and stricter path and reference validation
 - kept the Windows-only `keyring` backend explicitly pinned in the hash-locked CI dependency input
 - handled non-object JSON safely in `hook-simulate` and stopped exposing raw operating-system errors in OpenCLI command failures
+- canonicalised repository paths before OpenCLI plugin containment checks for cross-platform symlink handling
 - expanded CLI and OpenCLI failure-path tests, including installer prerequisites and verification steps
 - add a local `release gate` command and checklist that separate source-alpha promotion from blocked stable-production promotion
 - require an opaque evidence reference for new governed-memory erasure audit events, with backward-compatible verification of existing logs

@@ -424,6 +424,18 @@ def _empty_registry_metadata() -> dict[str, Any]:
 
 def _plugin_source_status(root: Path) -> dict[str, Any]:
     """Describe the local plugin source without following repository symlinks."""
+    try:
+        root = root.resolve()
+    except (OSError, RuntimeError):
+        path = root / OPENCLI_PLUGIN_REL
+        return {
+            "path": str(path),
+            "relative_path": OPENCLI_PLUGIN_REL,
+            "exists": False,
+            "manifest_exists": False,
+            "ready": False,
+            "reason": "ForgeLoop repository root could not be resolved safely.",
+        }
     path = root / OPENCLI_PLUGIN_REL
     manifest = path / "opencli-plugin.json"
     base = {

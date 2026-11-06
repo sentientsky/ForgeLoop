@@ -277,10 +277,22 @@ class OpenCliFailurePathTests(unittest.TestCase):
             self.assertFalse(missing_manifest["ready"])
             self.assertIn("manifest", missing_manifest["reason"])
 
-            with patch.object(Path, "resolve", side_effect=OSError("unavailable")):
+            original_resolve = Path.resolve
+
+            def fail_plugin_resolution(path: Path, *args, **kwargs) -> Path:
+                if path == root:
+                    return original_resolve(path, *args, **kwargs)
+                raise OSError("unavailable")
+
+            with patch.object(Path, "resolve", new=fail_plugin_resolution):
                 failed_resolve = _plugin_source_status(root)
             self.assertFalse(failed_resolve["ready"])
             self.assertIn("resolved safely", failed_resolve["reason"])
+
+            with patch.object(Path, "resolve", side_effect=OSError("unavailable")):
+                failed_root = _plugin_source_status(root)
+            self.assertFalse(failed_root["ready"])
+            self.assertIn("repository root", failed_root["reason"])
 
     def test_fixed_runner_handles_timeout_oserror_and_truncation(self) -> None:
         import subprocess
