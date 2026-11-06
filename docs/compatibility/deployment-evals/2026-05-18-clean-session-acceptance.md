@@ -29,7 +29,7 @@ Expected answer:
 
 | Tool | Entry file | Expected first validation | Status |
 | --- | --- | --- | --- |
-| Claude Code | `CLAUDE.md` | `python -m forgeloop pack "<task query>" . --limit 5` | Blocked: Claude Code 2.1.92 returned repeated API `401 authentication_failed` responses despite local auth status reporting logged in; rerun after interactive re-authentication |
+| Claude Code | `CLAUDE.md` | `python -m forgeloop pack "<task query>" . --limit 5` | Blocked: Claude Code 2.1.92 returned API `401 authentication_error` on 2026-10-20 despite local auth status reporting logged in; rerun after interactive re-authentication |
 | Codex | `AGENTS.md` | `python -m forgeloop pack "<task query>" . --limit 5` | Passed in Codex CLI 0.155.0-alpha.9.2, ephemeral session, read-only sandbox; CLI only |
 | Cursor | `.cursor/rules/forgeloop.mdc` | `python -m forgeloop validate .` | Prompt defined; current live acceptance not recorded |
 | GitHub Copilot | `.github/copilot-instructions.md` | `python -m forgeloop validate .` | Prompt defined; current live acceptance not recorded |
@@ -52,6 +52,12 @@ Copy `templates/deployment-acceptance-template.md`, fill the actual prompt, resp
 - Codex CLI was run with `--sandbox read-only --ephemeral --ignore-user-config`. It read `AGENTS.md`, `CLAUDE.md`, `docs/GETTING_STARTED.md`, and the verification standard, then correctly identified Discover, Frame, Build, Check, Capture; recommended the pointer-first `pack` command; and observed the OpenCLI safety rule. It reported that no files or commands were changed. This validates the CLI instruction path, not Codex desktop or every supported model.
 - Claude Code was run in print mode with no-session persistence and no write-capable tools. It emitted session initialisation, then repeated API `401 authentication_failed` responses. The run was stopped after six retries. The local auth-status command said logged in, so the discrepancy needs interactive account re-authentication and a rerun; Claude acceptance is not passed.
 - Neither result is a certification or a guarantee for future CLI versions. Repeat after tool upgrades and before release promotion.
+
+## 2026-10-20 Retry
+
+- Claude Code `2.1.92` was invoked again from the repository root with `Read` as the only tool, plan permission mode, project settings, no session persistence, and the documented eight-bullet acceptance prompt.
+- The client exited unsuccessfully before reading project files: its service returned `401 authentication_error` because the OAuth access token was invalid. No repository files were changed.
+- This is a failed acceptance, not a product failure. A repository owner must complete `claude auth logout` and `claude auth login` interactively, then rerun the documented command in a fresh no-write session. Do not mark this acceptance as passed until every stated criterion is evidenced.
 
 ## Rerun Claude Code
 

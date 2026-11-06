@@ -36,6 +36,8 @@ uv pip compile --generate-hashes --python-version 3.14 --python-platform x86_64-
 
 Review the complete diff, including versions, markers, and hashes. Do not remove `--require-hashes` from workflow install commands. Hosted tests run Python 3.10 through 3.14 on Ubuntu, Windows, and macOS.
 
+Keep the Windows-only `pywin32-ctypes` requirement explicit in `.github/requirements-ci.in`. It is needed by `keyring` on Windows and has previously disappeared from automated lock refreshes, causing hash-locked setup to fail before tests start.
+
 The `Fuzz` workflow runs a bounded, seeded Atheris session against the frontmatter parser. Reproduce it locally on Linux or macOS after installing the exact fuzzer lock:
 
 ```bash
