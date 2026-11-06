@@ -496,8 +496,8 @@ def _run_fixed(executable: str, args: list[str], timeout: int) -> CommandRun:
             _truncate(exc.stderr or ""),
             timed_out=True,
         )
-    except OSError as exc:
-        return CommandRun(command, None, "", _truncate(str(exc)), skipped=True, reason="command could not start")
+    except OSError:
+        return CommandRun(command, None, "", "", skipped=True, reason="command could not start")
     return CommandRun(
         command,
         completed.returncode,

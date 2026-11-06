@@ -22,11 +22,21 @@ Automated evidence:
 - Change branch protection to require at least one independent approval and code-owner review after a second maintainer is active. Current protection enforces nine CI contexts, but requires zero approvals and does not require code-owner review.
 - Work through the four open Scorecard maturity alerts honestly: complete a human-reviewed OpenSSF Best Practices assessment before adding a badge; allow the repository to age and remain active for `Maintained`; earn `Code-Review` through real independent reviews; enable review requirements only when a second reviewer exists. Do not manufacture history or dismiss maturity signals as code vulnerabilities.
 - Obtain provider-specific deletion evidence before enabling any external memory integration or making erasure/compliance claims. ForgeLoop currently ships no external-store deletion adapter.
-- Grow tests for CLI branches and optional OpenCLI integration beyond the current coverage floor.
+- Focused CLI and OpenCLI failure-path coverage was expanded on 2026-11-07. Local branch coverage is 75% for `cli.py` and 87% for `opencli.py` (80% total); continue testing these surfaces as features change. The Claude clean-session acceptance remains an external authenticated-session task.
+- Refresh the open Dependabot lockfile PRs after preserving the explicit Windows-only `pywin32-ctypes` requirement, and rerun all required CI checks before accepting those updates.
 - Keep the current adopter profile-only unless full-runtime adoption is explicitly made a core promise. A future managed installer needs ownership manifests, update/rollback rules, and modified-file-preserving uninstall tests on all supported platforms.
 - Revisit Python distribution only after resolving the PyPI name and import-namespace collision and packaging the full product.
 
 The 2026-09-24 closure audit is in `docs/checks/2026-09-24-production-closure-audit.md`. ForgeLoop is **not a production/stable go**; keep public status at source alpha until the human-review and Claude acceptance gates are closed.
+
+## To-Do List Of Additions
+
+These product additions are intentionally deferred until the basic workflow and its safety guarantees are fully covered:
+
+- Add an optional capture-candidate flow that requires human review before saving a memory note. Do not silently persist raw transcripts.
+- Create a small, hand-reviewed retrieval evaluation set and baseline before changing Forge Context Packet ranking.
+- Add an optional Beads integration for dependency-heavy projects instead of building a second task-graph system into ForgeLoop.
+- Add clean-session compatibility checks that exercise actual tool behaviour, not just the presence of profile files. Claude Code acceptance remains pending and is planned for the next available authenticated session.
 
 ## Contributions
 
