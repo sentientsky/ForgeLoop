@@ -65,6 +65,8 @@ docs/palace/drawers/YYYY-MM-DD-short-memory-name.md
 - Do not overwrite history when a fact changes.
 - Mark old facts as superseded.
 - Promote repeated patterns into templates, skills, agents, hooks, or standards.
+- Candidate body is read from standard input so it is not placed in the shell command history. Inspect it with `show`, then approve using the displayed fingerprint; any content change invalidates that fingerprint.
+- Candidate staging is local and ignored by Git, but it is not encrypted. Do not place raw transcripts, secrets, credentials, or personal data in candidates.
 
 ## Done When
 

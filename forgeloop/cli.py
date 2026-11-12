@@ -8,6 +8,8 @@ from pathlib import Path
 
 from .adoption import adopt_into_repo, adoption_source_root, format_adoption_report
 from .banner import render_intro
+from .beads import beads_ready
+from .capture_candidates import approve_candidate, inspect_candidate, propose_candidate
 from .compat import compatibility_report, format_compatibility_report
 from .context import build_context_pack, render_context_pack
 from .core import (
@@ -132,6 +134,25 @@ def main(argv: list[str] | None = None) -> int:
     new_parser.add_argument("--date", help="note date in YYYY-MM-DD format, defaults to today")
     new_parser.add_argument("--force", action="store_true", help="overwrite an existing note")
     new_parser.add_argument("--json", action="store_true", help="print machine-readable output")
+
+    capture_parser = subparsers.add_parser("capture-candidate", help="draft, inspect, or explicitly approve a memory capture")
+    capture_subparsers = capture_parser.add_subparsers(dest="capture_command", required=True)
+    capture_propose = capture_subparsers.add_parser("propose", help="stage a short candidate without saving it as memory")
+    capture_propose.add_argument("title")
+    capture_propose.add_argument("--root", default=".", help="repository root")
+    capture_show = capture_subparsers.add_parser("show", help="inspect a pending candidate before approval")
+    capture_show.add_argument("id")
+    capture_show.add_argument("--root", default=".", help="repository root")
+    capture_approve = capture_subparsers.add_parser("approve", help="save a reviewed candidate as a capture note")
+    capture_approve.add_argument("id")
+    capture_approve.add_argument("fingerprint", help="fingerprint printed by the show command")
+    capture_approve.add_argument("--root", default=".", help="repository root")
+
+    beads_parser = subparsers.add_parser("beads", help="read ready work from an existing Beads installation")
+    beads_subparsers = beads_parser.add_subparsers(dest="beads_command", required=True)
+    beads_ready_parser = beads_subparsers.add_parser("ready", help="read ready Beads tasks without claiming them")
+    beads_ready_parser.add_argument("root", nargs="?", default=".", help="project root")
+    beads_ready_parser.add_argument("--limit", type=int, default=20, help="maximum results, 1 to 100")
 
     hook_parser = subparsers.add_parser("hook-simulate", help="dry-run a future capture hook")
     hook_parser.add_argument("event", choices=["Stop", "PreCompact", "SessionEnd"], help="hook event")
@@ -340,6 +361,28 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(payload, indent=2))
         else:
             print(f"Created {result.path.relative_to(root)}")
+        return 0
+
+    if args.command == "capture-candidate":
+        try:
+            if args.capture_command == "propose":
+                result = propose_candidate(root, args.title, sys.stdin.read(20_001))
+                print(json.dumps(result, indent=2))
+            elif args.capture_command == "show":
+                print(json.dumps(inspect_candidate(root, args.id), indent=2))
+            else:
+                print(json.dumps(approve_candidate(root, args.id, args.fingerprint), indent=2))
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"Capture candidate failed: {exc}", file=sys.stderr)
+            return 1
+        return 0
+
+    if args.command == "beads" and args.beads_command == "ready":
+        try:
+            print(json.dumps(beads_ready(root, args.limit), indent=2))
+        except (OSError, ValueError, TypeError, RuntimeError) as exc:
+            print(f"Beads query failed: {exc}", file=sys.stderr)
+            return 1
         return 0
 
     if args.command == "hook-simulate":

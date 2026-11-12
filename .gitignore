@@ -10,6 +10,7 @@ Thumbs.db
 
 # Local ForgeLoop setup
 .forgeloop.local.json
+.forgeloop-candidates/
 
 # Local environment files
 .env

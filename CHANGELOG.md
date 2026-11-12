@@ -10,6 +10,10 @@ ForgeLoop follows practical semantic versioning:
 
 ## Unreleased
 
+- add an opt-in, human-reviewed capture-candidate flow; candidates are local, Git-ignored, and never auto-promoted
+- add retrieval-ranking regression coverage without changing ranking behaviour
+- add an optional read-only Beads ready-work bridge with bounded results and no automatic installation
+- clarify clean-session compatibility evidence and Beads integration boundaries in the roadmap
 - hardened stable-promotion evidence checks with current, structured attestations and stricter path and reference validation
 - kept the Windows-only `keyring` backend explicitly pinned in the hash-locked CI dependency input
 - fixed hash-locked CI resolution for Python 3.10 by explicitly pinning its conditional `tomli` dependency; kept coverage compatible with the supported Python matrix
