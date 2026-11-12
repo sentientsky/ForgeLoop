@@ -194,7 +194,7 @@ Only after reviewing the exact content, approve with the displayed fingerprint:
 python -m forgeloop capture-candidate approve CANDIDATE_ID REVIEW_FINGERPRINT --root .
 ```
 
-If the candidate changes after inspection, the fingerprint no longer matches. Staging is local and Git-ignored, but not encrypted; never use it for raw transcripts, credentials, secrets, or personal data. Approval creates a new capture and never overwrites an existing note.
+If the candidate changes after inspection, the fingerprint no longer matches. Staging is local and Git-ignored, but not encrypted. POSIX permissions are owner-only; on Windows, access follows the parent folder ACL. Never use candidates for raw transcripts, credentials, secrets, or personal data. Approval creates a new capture and never overwrites an existing note.
 
 ## Optional Beads Bridge
 

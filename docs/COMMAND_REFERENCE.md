@@ -63,7 +63,7 @@ python -m forgeloop new decision "Decision title" .
 
 ## Reviewed Capture Candidates
 
-Candidate text is read from stdin so it is not included in shell history. Keep candidates concise, and do not stage transcripts, secrets, or personal data. The staging directory is local and Git-ignored, not encrypted.
+Candidate text is read from stdin so it is not included in shell history. On POSIX systems the staging directory and files use owner-only permissions. Windows uses the parent directory's inherited ACL. Keep candidates concise, and do not stage transcripts, secrets, or personal data. Staging is local and Git-ignored, not encrypted.
 
 ```bash
 python -m forgeloop capture-candidate propose "Lesson title" --root .

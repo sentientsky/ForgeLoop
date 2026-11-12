@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import stat
 import tempfile
 import unittest
 from pathlib import Path
@@ -17,6 +19,16 @@ from forgeloop.context import build_context_pack
 
 
 class CaptureCandidateTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == "posix", "POSIX permission bits are not portable to Windows ACLs")
+    def test_candidate_storage_is_owner_only(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            candidate = propose_candidate(root, "Private draft", "Short reusable lesson.")
+            directory_mode = stat.S_IMODE((root / ".forgeloop-candidates").stat().st_mode)
+            file_mode = stat.S_IMODE((root / candidate["path"]).stat().st_mode)
+        self.assertEqual(0o700, directory_mode)
+        self.assertEqual(0o600, file_mode)
+
     def test_candidate_requires_explicit_approval_before_memory_write(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
