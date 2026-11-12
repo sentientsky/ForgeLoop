@@ -7,7 +7,7 @@ tags: [deployment, compatibility, release]
 
 # Clean-Session Acceptance Pack
 
-This file records one real Codex CLI acceptance and one blocked Claude Code CLI attempt. It is not evidence that other tools or interactive desktop sessions have been tested.
+This file records one real Codex CLI acceptance, one prior blocked Claude Code CLI attempt, and the successful Claude Code CLI rerun on 2026-11-12. It is not evidence that other tools or interactive desktop sessions have been tested.
 
 It does not pretend to be a live transcript from every external product UI. It records the repeatable check a maintainer should run when refreshing public compatibility claims.
 
@@ -29,7 +29,7 @@ Expected answer:
 
 | Tool | Entry file | Expected first validation | Status |
 | --- | --- | --- | --- |
-| Claude Code | `CLAUDE.md` | `python -m forgeloop pack "<task query>" . --limit 5` | Blocked: Claude Code 2.1.92 returned API `401 authentication_error` on 2026-10-20 despite local auth status reporting logged in; rerun after interactive re-authentication |
+| Claude Code | `CLAUDE.md` | `python -m forgeloop pack "<task query>" . --limit 5` | Passed in a fresh read-only Claude Code CLI run on 2026-11-12; previous 2026-10-20 run was blocked by an invalid OAuth token. Desktop was not used for this check. |
 | Codex | `AGENTS.md` | `python -m forgeloop pack "<task query>" . --limit 5` | Passed in Codex CLI 0.155.0-alpha.9.2, ephemeral session, read-only sandbox; CLI only |
 | Cursor | `.cursor/rules/forgeloop.mdc` | `python -m forgeloop validate .` | Prompt defined; current live acceptance not recorded |
 | GitHub Copilot | `.github/copilot-instructions.md` | `python -m forgeloop validate .` | Prompt defined; current live acceptance not recorded |
@@ -59,9 +59,17 @@ Copy `templates/deployment-acceptance-template.md`, fill the actual prompt, resp
 - The client exited unsuccessfully before reading project files: its service returned `401 authentication_error` because the OAuth access token was invalid. No repository files were changed.
 - This is a failed acceptance, not a product failure. A repository owner must complete `claude auth logout` and `claude auth login` interactively, then rerun the documented command in a fresh no-write session. Do not mark this acceptance as passed until every stated criterion is evidenced.
 
-## Rerun Claude Code
+## 2026-11-12 Claude Code CLI Run
 
-The recorded Claude check is blocked by API authentication failures. Do not count it as a pass until a fresh session completes successfully. Re-authenticate interactively from a terminal first:
+- Claude Code `2.1.92` was shown in the interactive client immediately before this run; the account identifier and subscription details are intentionally not recorded.
+- The exact read-only acceptance command above was run from the ForgeLoop repository root in PowerShell, with `Read` as the only tool, plan permission mode, project settings, and session persistence disabled.
+- Claude reported that all three requested files were read and that it modified no files and ran no commands. It identified Discover, Frame, Build, Check, and Capture; gave a safety rule against placing secrets or personal data in memory, logs, or Git-tracked Markdown; and recommended `python -m forgeloop pack "<task query>" --limit 5` before opening old memory notes. It named `python -m forgeloop doctor .` as a general read-only health check. The omitted repository-root argument for `pack` is equivalent here because the CLI defaults that optional argument to `.`.
+- The owner reported exit code `0`; `git status --short` produced no output. No authentication error occurred.
+- Result: passed for the Claude Code CLI instruction path and this clean-session prompt. This is not a test of Claude Desktop, all Claude Code features, other models, or future client versions. Repeat after significant client or instruction changes.
+
+## Refresh Claude Code Acceptance
+
+The 2026-11-12 CLI acceptance passed after interactive re-authentication. If a later run returns an authentication error, re-authenticate interactively from a terminal first:
 
 ```text
 claude auth status
