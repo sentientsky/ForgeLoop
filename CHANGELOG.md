@@ -12,6 +12,8 @@ ForgeLoop follows practical semantic versioning:
 
 - hardened stable-promotion evidence checks with current, structured attestations and stricter path and reference validation
 - kept the Windows-only `keyring` backend explicitly pinned in the hash-locked CI dependency input
+- fixed hash-locked CI resolution for Python 3.10 by explicitly pinning its conditional `tomli` dependency; kept coverage compatible with the supported Python matrix
+- aligned CodeQL `init` and `analyze` on the same immutable action release and updated the CI Ruff floor
 - handled non-object JSON safely in `hook-simulate` and stopped exposing raw operating-system errors in OpenCLI command failures
 - canonicalised repository paths before OpenCLI plugin containment checks for cross-platform symlink handling
 - expanded CLI and OpenCLI failure-path tests, including installer prerequisites and verification steps
