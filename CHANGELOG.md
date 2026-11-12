@@ -11,6 +11,7 @@ ForgeLoop follows practical semantic versioning:
 ## Unreleased
 
 - add an opt-in, human-reviewed capture-candidate flow; candidates are local, Git-ignored, and never auto-promoted
+- restrict candidate staging to owner-only POSIX permissions and refuse symlink-following file creation
 - add retrieval-ranking regression coverage without changing ranking behaviour
 - add an optional read-only Beads ready-work bridge with bounded results and no automatic installation
 - clarify clean-session compatibility evidence and Beads integration boundaries in the roadmap

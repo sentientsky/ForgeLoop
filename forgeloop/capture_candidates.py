@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import os
 import re
 import uuid
 from datetime import date
@@ -27,11 +28,15 @@ def propose_candidate(root: Path, title: str, body: str) -> dict[str, str]:
     directory = root / ".forgeloop-candidates"
     if _is_link_like(directory):
         raise ValueError("Refusing to use a symlinked candidate directory")
-    directory.mkdir(exist_ok=True)
+    directory.mkdir(mode=0o700, exist_ok=True)
+    if _is_link_like(directory):
+        raise ValueError("Refusing to use a symlinked candidate directory")
+    if os.name == "posix":
+        directory.chmod(0o700)
     candidate_id = uuid.uuid4().hex
     path = directory / f"{candidate_id}.json"
     payload = {"id": candidate_id, "title": title, "body": body, "status": "pending"}
-    _write_new(path, json.dumps(payload, ensure_ascii=True, indent=2) + "\n")
+    _write_new(path, json.dumps(payload, ensure_ascii=True, indent=2) + "\n", mode=0o600)
     return {"id": candidate_id, "path": str(path.relative_to(root)), "status": "pending"}
 
 
@@ -97,9 +102,11 @@ def _read_candidate(root: Path, candidate_id: str) -> dict[str, str]:
     return payload
 
 
-def _write_new(path: Path, content: str) -> None:
+def _write_new(path: Path, content: str, mode: int = 0o644) -> None:
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
     try:
-        with path.open("x", encoding="utf-8", newline="\n") as stream:
+        descriptor = os.open(path, flags, mode)
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as stream:
             stream.write(content)
     except FileExistsError:
         raise ValueError("Refusing to overwrite an existing file") from None
