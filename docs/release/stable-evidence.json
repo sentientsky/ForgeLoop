@@ -1,11 +1,14 @@
 {
   "schema_version": 1,
   "claude_clean_session": {
-    "status": "blocked",
-    "updated_on": "2026-10-20",
-    "valid_until": "2026-11-19",
+    "status": "passed",
+    "updated_on": "2026-11-12",
+    "valid_until": "2026-12-12",
     "evidence_path": "docs/compatibility/deployment-evals/2026-05-18-clean-session-acceptance.md",
-    "reason": "The 2026-10-20 clean-session retry failed because the installed Claude Code OAuth token was invalid; interactive re-authentication is required."
+    "tool_version": "Claude Code 2.1.92 (interactive banner before run)",
+    "command_ref": "docs/compatibility/deployment-evals/2026-05-18-clean-session-acceptance.md#2026-11-12-claude-code-cli-run",
+    "working_tree": "unchanged",
+    "reason": "Read-only CLI acceptance exited 0, identified the five stages, recommended pack before memory reads, and left the working tree unchanged."
   },
   "independent_review": {
     "status": "blocked",

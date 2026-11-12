@@ -832,9 +832,11 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertTrue(source_report["source_alpha_ready"])
         self.assertFalse(source_report["stable_ready"])
         self.assertFalse(stable_report["ok"])
-        self.assertIn(
-            "stable-claude-acceptance",
-            {check["name"] for check in stable_report["checks"] if check["status"] == "block"},
+        stable_checks = {check["name"]: check["status"] for check in stable_report["checks"]}
+        self.assertEqual("pass", stable_checks["stable-claude-acceptance"])
+        self.assertEqual(
+            {"stable-independent-review", "stable-external-erasure-evidence"},
+            {name for name, status in stable_checks.items() if status == "block"},
         )
 
     def test_release_gate_cli_reports_decision(self) -> None:
