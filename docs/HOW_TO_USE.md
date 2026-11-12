@@ -174,6 +174,38 @@ python -m forgeloop new solution "Safe export button pattern" .
 
 The CLI uses templates, safe file names, and overwrite protection.
 
+### Review Before Saving A Capture
+
+For a short reusable lesson, you can stage a candidate separately and inspect it before promoting it into memory. The candidate body is read from standard input rather than a command-line argument, avoiding shell-history exposure:
+
+```text
+python -m forgeloop capture-candidate propose "Bounded retry lesson" --root .
+```
+
+Type or paste only the concise lesson, then send end-of-input (Ctrl+Z, then Enter in PowerShell). The command prints a candidate ID. Inspect its text and fingerprint:
+
+```text
+python -m forgeloop capture-candidate show CANDIDATE_ID --root .
+```
+
+Only after reviewing the exact content, approve with the displayed fingerprint:
+
+```text
+python -m forgeloop capture-candidate approve CANDIDATE_ID REVIEW_FINGERPRINT --root .
+```
+
+If the candidate changes after inspection, the fingerprint no longer matches. Staging is local and Git-ignored, but not encrypted; never use it for raw transcripts, credentials, secrets, or personal data. Approval creates a new capture and never overwrites an existing note.
+
+## Optional Beads Bridge
+
+If Beads is already installed and configured in the project, ForgeLoop can read ready tasks without taking ownership of the task graph:
+
+```text
+python -m forgeloop beads ready . --limit 20
+```
+
+This only calls the read path `bd ready --json --brief --limit N`; it does not install or initialise Beads, claim a task, sync, or write data. Results are capped at 100 and the subprocess has a 10-second timeout. Check the installed Beads version and its [CLI reference](https://github.com/gastownhall/beads/blob/main/docs/CLI_REFERENCE.md) first. If Beads is absent, ForgeLoop reports that and does not install it.
+
 ## Updating The Memory Index
 
 After adding captures, solutions, entities, timelines, or palace drawers, run:

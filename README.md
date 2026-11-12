@@ -245,6 +245,8 @@ This first version includes:
 - hook and command guidance without unsafe defaults
 - a small ForgeLoop CLI for validation, memory indexing, and status checks
 - a compact context packet command for token-efficient memory lookup
+- an opt-in reviewed-capture flow that stages a short lesson and requires fingerprint-bound approval before saving it
+- an optional read-only Beads bridge for ready tasks when Beads is already installed
 - unit tests and a GitHub Actions workflow
 
 It intentionally does not include a full MCP server, hosted dashboard, or automatic background capture yet. Those belong in later phases after the manual workflow proves useful.

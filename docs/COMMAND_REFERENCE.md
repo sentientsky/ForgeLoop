@@ -61,6 +61,29 @@ python -m forgeloop new solution "Pattern title" .
 python -m forgeloop new decision "Decision title" .
 ```
 
+## Reviewed Capture Candidates
+
+Candidate text is read from stdin so it is not included in shell history. Keep candidates concise, and do not stage transcripts, secrets, or personal data. The staging directory is local and Git-ignored, not encrypted.
+
+```bash
+python -m forgeloop capture-candidate propose "Lesson title" --root .
+# Type or paste a short candidate, then send EOF (Ctrl+Z then Enter in PowerShell).
+python -m forgeloop capture-candidate show CANDIDATE_ID --root .
+python -m forgeloop capture-candidate approve CANDIDATE_ID REVIEW_FINGERPRINT --root .
+```
+
+Approval writes a new file only; it refuses overwrites. The fingerprint ties approval to the exact title and body shown during review. Inspect candidate content for privacy and correctness before approving.
+
+## Beads (Optional)
+
+ForgeLoop does not install or initialise Beads. When `bd` is already installed and configured for this project, this command reads a bounded ready-work list:
+
+```bash
+python -m forgeloop beads ready . --limit 20
+```
+
+It invokes `bd ready --json --brief --limit N` with `shell=False` and a 10-second timeout. It never claims work, creates a second task graph, syncs, or writes Beads data. The official [Beads CLI reference](https://github.com/gastownhall/beads/blob/main/docs/CLI_REFERENCE.md) documents `bd ready` and its separate `--claim` flag; check the installed Beads version before relying on this integration.
+
 ## Secrets
 
 ```bash
