@@ -43,6 +43,49 @@ class CiDependencyLockTests(unittest.TestCase):
             tomli_hashes += 1
         self.assertGreaterEqual(tomli_hashes, 2)
 
+    def test_coverage_lock_respects_python_310_support(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        requirements_in = (root / ".github/requirements-ci.in").read_text(encoding="utf-8")
+        requirements_lock = (root / ".github/requirements-ci.txt").read_text(encoding="utf-8")
+
+        self.assertRegex(
+            requirements_in,
+            r"(?m)^coverage\[toml\]>=7\.16\.1;\s*python_version < '3\.11'$",
+        )
+        self.assertRegex(
+            requirements_in,
+            r"(?m)^coverage\[toml\]>=7\.17\.3;\s*python_version >= '3\.11'$",
+        )
+        lock_lines = requirements_lock.splitlines()
+        for marker, expected_version in (("< '3.11'", "7.16."), (">= '3.11'", "7.17.3")):
+            index = next(
+                i
+                for i, line in enumerate(lock_lines)
+                if line.startswith("coverage==")
+                and expected_version in line
+                and f"python_full_version {marker}" in line
+            )
+            hashes = 0
+            for line in lock_lines[index + 1 :]:
+                if not line.startswith("    --hash=sha256:"):
+                    break
+                hashes += 1
+            self.assertGreaterEqual(hashes, 2)
+
+    def test_backports_tarfile_transitive_dependency_is_hash_locked(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        requirements_lock = (root / ".github/requirements-ci.txt").read_text(encoding="utf-8")
+        lock_lines = requirements_lock.splitlines()
+        index = next(i for i, line in enumerate(lock_lines) if line.startswith("backports-tarfile=="))
+
+        self.assertIn("python_full_version < '3.12'", lock_lines[index])
+        hashes = 0
+        for line in lock_lines[index + 1 :]:
+            if not line.startswith("    --hash=sha256:"):
+                break
+            hashes += 1
+        self.assertGreaterEqual(hashes, 2)
+
     def test_codeql_init_and_analyze_use_the_same_pinned_release(self) -> None:
         root = Path(__file__).resolve().parents[1]
         workflow = (root / ".github/workflows/codeql.yml").read_text(encoding="utf-8")
