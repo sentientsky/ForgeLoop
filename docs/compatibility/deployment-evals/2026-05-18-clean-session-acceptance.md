@@ -96,4 +96,4 @@ Count the check as passed only if the command exits successfully, identifies Dis
 - Codex CLI `0.167.0-alpha.4.1` was run with `--sandbox read-only --ephemeral --ignore-user-config`.
 - The first attempt prohibited all commands, so Codex could not inspect the requested files. The second allowed only read-only file inspection, but the local execution policy blocked its `Get-Content` subprocess before the files were read.
 - Codex therefore could not complete the acceptance criteria. No repository files were changed and no tests, validation commands, or network access were used in that session.
-- This is an environment-blocked acceptance, not a compatibility pass. Retry when read-only file-inspection commands are permitted for the Codex CLI session. Keep Claude Code acceptance blocked until its separate authenticated run passes.
+- This Codex attempt is environment-blocked, not a compatibility pass. Retry when read-only file-inspection commands are permitted for the Codex CLI session. The earlier Claude Code blocker was superseded by the successful 2026-11-12 run recorded above; do not carry that Claude blocker forward.
