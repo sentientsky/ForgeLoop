@@ -30,7 +30,7 @@ Expected answer:
 | Tool | Entry file | Expected first validation | Status |
 | --- | --- | --- | --- |
 | Claude Code | `CLAUDE.md` | `python -m forgeloop pack "<task query>" . --limit 5` | Passed in a fresh read-only Claude Code CLI run on 2026-11-12; previous 2026-10-20 run was blocked by an invalid OAuth token. Desktop was not used for this check. |
-| Codex | `AGENTS.md` | `python -m forgeloop pack "<task query>" . --limit 5` | Passed in Codex CLI 0.155.0-alpha.9.2, ephemeral session, read-only sandbox; CLI only |
+| Codex | `AGENTS.md` | `python -m forgeloop pack "<task query>" . --limit 5` | Passed in Codex CLI 0.155.0-alpha.9.2 on 2026-09-24; refresh attempts on 2026-11-12 and 2026-11-19 were blocked before repository files could be inspected. Latest acceptance is not current; CLI only. |
 | Cursor | `.cursor/rules/forgeloop.mdc` | `python -m forgeloop validate .` | Prompt defined; current live acceptance not recorded |
 | GitHub Copilot | `.github/copilot-instructions.md` | `python -m forgeloop validate .` | Prompt defined; current live acceptance not recorded |
 | Gemini | `GEMINI.md` | `python -m forgeloop tokens "memory validation" . --tool gemini` | Prompt defined; current live acceptance not recorded |
@@ -97,3 +97,9 @@ Count the check as passed only if the command exits successfully, identifies Dis
 - The first attempt prohibited all commands, so Codex could not inspect the requested files. The second allowed only read-only file inspection, but the local execution policy blocked its `Get-Content` subprocess before the files were read.
 - Codex therefore could not complete the acceptance criteria. No repository files were changed and no tests, validation commands, or network access were used in that session.
 - This Codex attempt is environment-blocked, not a compatibility pass. Retry when read-only file-inspection commands are permitted for the Codex CLI session. The earlier Claude Code blocker was superseded by the successful 2026-11-12 run recorded above; do not carry that Claude blocker forward.
+
+## 2026-11-19 Codex CLI Attempt
+
+- Codex CLI `0.169.0-alpha.11.1` was run with `--sandbox read-only --ephemeral --ignore-user-config` from the repository root.
+- Its initial PowerShell inspection command was rejected by the machine's local execution policy before repository files were read. The model named the five workflow stages, but recommended `python -m forgeloop validate .` instead of the required pointer-first `pack` command.
+- The acceptance criteria were not met. No repository files were changed, and the local policy was not bypassed. This is environment-blocked evidence, not a compatibility pass; retry when read-only file inspection is permitted.

@@ -11,7 +11,7 @@ Automated evidence:
 - Hosted CI tests Python 3.10 through 3.14 on Ubuntu, Windows, and macOS; lint, validation, and isolated CLI wheel smoke tests run on Ubuntu.
 - CodeQL and a bounded seeded fuzz workflow run on GitHub Actions.
 - `forgeloop compat` confirms profile files only. It does not launch external coding tools or prove they loaded instructions. The clean-session protocol is a manually executed, evidence-recorded behaviour check.
-- Claude Code CLI acceptance passed on 2026-11-12 and is recorded as current through 2026-12-12. Codex CLI passed on 2026-09-24, but its 2026-11-12 refresh was blocked by the local execution policy before files were read; repeat it before presenting Codex acceptance as freshly verified. Evidence and limits are in `docs/compatibility/deployment-evals/2026-05-18-clean-session-acceptance.md`.
+- Claude Code CLI acceptance passed on 2026-11-12 and is recorded as current through 2026-12-12. Codex CLI passed on 2026-09-24, but refresh attempts on 2026-11-12 and 2026-11-19 were blocked by the local execution policy before files were read; the latest attempt also missed the pointer-first command criterion. Repeat it before presenting Codex acceptance as freshly verified. Evidence and limits are in `docs/compatibility/deployment-evals/2026-05-18-clean-session-acceptance.md`.
 - The Python wheel is an internal smoke-test artifact only; no PyPI distribution is published.
 
 ## Before Stable Promotion
@@ -36,7 +36,7 @@ Repo-side implementation completed on 2026-11-12 where possible; external-tool a
 - Implemented local capture candidates with explicit propose, show, and approve steps; no transcript ingestion or automatic persistence. Review content for secrets and personal data before approval.
 - Added a tiny deterministic retrieval regression set in unit tests; current ranker is unchanged. Expand the hand-reviewed set before any ranking modification.
 - Added an optional read-only Beads bridge using `bd ready --json --brief`, with bounded results, timeout, and no installation, setup, claiming, or syncing. It relies on an existing local Beads installation; monitor upstream CLI changes and do not broaden it into a second task graph.
-- A clean-session acceptance protocol and durable evidence template are documented, but actual behaviour still requires running each external tool. Claude Code CLI passed on 2026-11-12; the later Codex CLI refresh was blocked by local execution policy, so rerun it. Cursor, Copilot, and other tools have not passed live acceptance.
+- A clean-session acceptance protocol and durable evidence template are documented, but actual behaviour still requires running each external tool. Claude Code CLI passed on 2026-11-12; Codex CLI refreshes remain blocked by local execution policy, so rerun when read-only file inspection is permitted. Cursor, Copilot, and other tools have not passed live acceptance.
 
 ## Contributions
 
